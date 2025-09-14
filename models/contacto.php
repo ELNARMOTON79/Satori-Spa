@@ -1,6 +1,7 @@
 <?php
-    include_once 'config/database.php';
-
-    class Contacto extends Conexion{
-        //Aqui iran las sentencias SQL
+class ContactoController {
+    public function index() {
+        echo "Página de contacto";
     }
+}
+?>
