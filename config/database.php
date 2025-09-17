@@ -10,44 +10,69 @@
         private $password = '7PnXDiakUbL3hx7DEG0tQevrvAvmlNYK';
         private $base = 'satori';
         private $puerto = '5432';
-        public $sentencia;
-        private $conexion;
+        protected $conexion;
+
+        public function __construct()
+        {
+            $this->abrir_conexion();
+        }
+
+        public function __destruct()
+        {
+            $this->cerrar_conexion();
+        }
 
         private function abrir_conexion()
         {
-            // Usamos pg_connect() para PostgreSQL
+            if (!function_exists('pg_connect')) {
+                throw new Exception("La extensión de PostgreSQL no está habilitada en PHP.");
+            }
+
             $conn_string = "host=$this->host port=$this->puerto dbname=$this->base user=$this->usuario password=$this->password";
-            $this->conexion = pg_connect($conn_string);
+            // Suprimimos el warning de PHP para manejar el error con una excepción
+            $this->conexion = @pg_connect($conn_string);
 
             if (!$this->conexion) {
-                die("Error de conexión: " . pg_last_error());
+                throw new Exception("Error de conexión: " . pg_last_error());
             }
         }
 
         private function cerrar_conexion()
         {
-            // Usamos pg_close()
-            pg_close($this->conexion); 
+            if ($this->conexion) {
+                pg_close($this->conexion);
+                $this->conexion = null;
+            }
         }
 
-        public function ejecutar_sentencia()
+        /**
+         * Ejecuta una consulta que no devuelve filas (INSERT, UPDATE, DELETE).
+         * @param string $sql La consulta SQL.
+         * @param array $params Los parámetros para la consulta preparada.
+         * @return resource|false El resultado de la consulta o false en caso de error.
+         */
+        public function ejecutar_sentencia($sql, $params = [])
         {
-            $this->abrir_conexion();
-            $bandera = pg_query($this->conexion, $this->sentencia);
-            $this->cerrar_conexion();
-            return $bandera;
-        }
-
-        public function obtener_sentencia()
-        {
-            $this->abrir_conexion();
-            $result = pg_query($this->conexion, $this->sentencia);
+            $result = pg_query_params($this->conexion, $sql, $params);
+            if (!$result) {
+                throw new Exception("Error al ejecutar la sentencia: " . pg_last_error($this->conexion));
+            }
             return $result;
         }
-        
-        public function obtener_ultimo_id()
+
+        /**
+         * Ejecuta una consulta (SELECT) y devuelve todas las filas como un array asociativo.
+         * @param string $sql La consulta SQL.
+         * @param array $params Los parámetros para la consulta preparada.
+         * @return array Un array con los resultados.
+         */
+        public function obtener_sentencia($sql, $params = [])
         {
-            return null;
+            $result = pg_query_params($this->conexion, $sql, $params);
+            if (!$result) {
+                throw new Exception("Error al obtener la sentencia: " . pg_last_error($this->conexion));
+            }
+            return pg_fetch_all($result, PGSQL_ASSOC) ?: [];
         }
     }
 ?>
