@@ -29,5 +29,5 @@ switch ($url[0]) {
 
 // Permite usar las variables PHP dentro de la vista HTML
 ob_start();
-include 'views/admin_layout.php';
+include 'views/dashboard_layout.php';
 echo ob_get_clean();

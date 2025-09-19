@@ -11,7 +11,7 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow h-screen flex flex-col">
             <div class="flex items-center px-6 py-4">
-                <img src="imagen/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
+                <img src="views/images/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
                 <div>
                     <h1 class="font-bold text-lg text-[#5C4633]">SATORI SPA</h1>
                     <span class="text-xs text-[#8C837B]">Panel de Administración</span>

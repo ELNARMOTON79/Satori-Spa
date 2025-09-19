@@ -13,7 +13,7 @@
                     <th class="p-3">ID</th>
                     <th class="p-3">Nombre</th>
                     <th class="p-3">Apellido</th>
-                    <th class="p-3">Correo Electrónico</th>
+                    <th class="p-3">Email</th>
                     <th class="p-3">Rol</th>
                     <th class="p-3">Acciones</th>
                 </tr>
