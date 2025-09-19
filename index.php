@@ -1,16 +1,33 @@
 <?php
-  ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
 
-    $url = isset($_GET['url']) ? $_GET['url'] : 'login_view';
-    $url = filter_var($url, FILTER_SANITIZE_URL);
-    $url = explode('/', $url);
+require_once 'config/database.php';
+require_once 'controllers/UserController.php';
 
-    if($url[0] === 'login_view'){
-        require_once 'views/login_view.php';
-        exit;
-    }   else if ($url[0] == 'dashboard') {
-        require_once 'views/dashboard.php';
-        exit;
-    } 
+// Basic router
+$page = isset($_GET['url']) ? rtrim($_GET['url'], '/') : 'dashboard';
+$page = filter_var($page, FILTER_SANITIZE_URL);
+$url = explode('/', $page);
+
+$content_view = 'views/dashboard_content.php'; // Vista por defecto
+$data = []; // Datos para la vista
+
+switch ($url[0]) {
+    case 'dashboard':
+        // Aquí podrías cargar datos para el dashboard si fuera necesario
+        $content_view = 'views/dashboard_content.php';
+        break;
+    case 'usuarios':
+        $userController = new UserController();
+        $data['users'] = $userController->getAllUsers();
+        $content_view = 'views/user_view.php';
+        break;
+    case 'servicios':
+        // Aún no hay lógica, solo cargamos una vista vacía.
+        $content_view = 'views/service_view.php';
+        break;
+}
+
+// Permite usar las variables PHP dentro de la vista HTML
+ob_start();
+include 'views/admin_layout.php';
+echo ob_get_clean();

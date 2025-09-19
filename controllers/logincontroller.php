@@ -1,21 +1,27 @@
 <?php
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-    include_once './models/database.php';
-    include './views/login_view.html';
+include_once '../models/contacto.php';
 
-    if (isset($_POST['login'])){
-        $correo = $_POST['email'];
-        $contraseña = $_['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+    $correo = $_POST['email'] ?? '';
+    $contrasena = $_POST['password'] ?? '';
 
-        $contacto = new Contacto();
-        $resultadousuario = $contacto->login($correo, $contraseña);
+    $Contacto = new Contacto();
+    $usuario = $Contacto->login($correo, $contrasena);
 
-        if ($usuario){
-            echo "Login Exitoso perrakito, " . $usuario[0] ['nombre'] . "!";
-        } else {
-            echo "Credenciales Incorrctas NEGRO.    Por favor, Intentalo de nuevo";
-        }
+    if ($usuario) {
+        $_SESSION['user'] = $usuario['correo'];
+        header('Location: ../index.php?url=dashboard');
+        exit;
+    } else {
+        header('Location: ../index.php?url=login_view&error=1');
+        exit;
     }
+} else {
+    header('Location: ../index.php?url=login_view');
+    exit;
+}
