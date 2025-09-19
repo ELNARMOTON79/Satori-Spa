@@ -42,7 +42,14 @@
         {
             $this->abrir_conexion();
             $result = pg_query($this->conexion, $this->sentencia);
-            return $result;
+            
+            // pg_query devuelve un recurso. Necesitamos convertirlo a un array.
+            // pg_fetch_all hace exactamente eso. PGSQL_ASSOC crea un array asociativo (['columna' => 'valor']).
+            $data = pg_fetch_all($result, PGSQL_ASSOC);
+            $this->cerrar_conexion();
+
+            // Si no hay filas, pg_fetch_all devuelve false. Devolvemos un array vacío para evitar errores en la vista.
+            return $data ?: [];
         }
         
         public function obtener_ultimo_id()

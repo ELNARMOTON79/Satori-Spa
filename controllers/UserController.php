@@ -2,18 +2,16 @@
 
 class UserController {
 
-    private $db;
+    private $userModel;
 
     public function __construct() {
-        $this->db = new Conexion();
+        // Instanciamos el modelo en lugar de la conexión directa.
+        $this->userModel = new Contacto();
     }
 
     public function getAllUsers() {
-        // Es mejor ser explícito con las columnas que necesitas.
-        // Asegúrate de que los nombres (id, nombre, etc.) coincidan con tu tabla en la BD.
-        $this->db->sentencia = "SELECT id, nombre, apellido, correo, id_rol FROM usuarios ORDER BY id ASC";
-        // Ahora obtener_sentencia() devuelve directamente el array de usuarios.
-        $users = $this->db->obtener_sentencia();
-        return $users;
+        // La lógica de la base de datos ahora está en el modelo.
+        // El controlador solo le pide los datos.
+        return $this->userModel->getAllUsers();
     }
 }

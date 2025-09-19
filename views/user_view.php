@@ -10,7 +10,6 @@
         <table class="w-full text-left">
             <thead class="bg-[#F5EBDD] text-[#5C4633]">
                 <tr>
-                    <th class="p-3">ID</th>
                     <th class="p-3">Nombre</th>
                     <th class="p-3">Apellido</th>
                     <th class="p-3">Email</th>
@@ -22,7 +21,6 @@
                 <?php if (!empty($data['users'])): ?>
                     <?php foreach ($data['users'] as $user): ?>
                         <tr class="border-b border-[#EAE3D9]">
-                            <td class="p-3"><?= htmlspecialchars($user['id']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($user['nombre']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($user['apellido']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($user['correo']) ?></td>

@@ -1,6 +1,7 @@
 <?php
 
 require_once 'config/database.php';
+require_once 'models/contacto.php';
 require_once 'controllers/UserController.php';
 
 // Basic router
