@@ -47,10 +47,10 @@
                 <div></div>
                 <div class="text-right">
                     <span class="text-[#5C4633]">Bienvenido, Administrador</span>
-                    <button class="ml-4 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#E9DCCB] focus:outline-none">
+                    <a href="controllers/logout.php" class="ml-4 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#E9DCCB] focus:outline-none inline-block">
                         <svg class="inline h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
                         Cerrar Sesión
-                    </button>
+                    </a>
                 </div>
             </div>
 

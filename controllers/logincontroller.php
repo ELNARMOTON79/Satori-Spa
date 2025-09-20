@@ -18,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         header('Location: ../index.php?url=dashboard');
         exit;
     } else {
-        header('Location: ../index.php?url=login_view&error=1');
+        header('Location: ../index.php?error=1');
         exit;
     }
 } else {
-    header('Location: ../index.php?url=login_view');
+    header('Location: ../index.php');
     exit;
 }

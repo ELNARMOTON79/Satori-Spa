@@ -11,7 +11,7 @@
         private $base = 'satori';
         private $puerto = '5432';
         public $sentencia;
-        private $conexion;
+        protected $conexion = null;
 
         private function abrir_conexion()
         {
@@ -25,36 +25,47 @@
 
         private function cerrar_conexion()
         {
-            pg_close($this->conexion); 
+            if ($this->conexion) {
+                pg_close($this->conexion);
+                $this->conexion = null;
+            }
+        }
+
+        public function __destruct()
+        {
+            $this->cerrar_conexion();
+        }
+
+        public function getConexion()
+        {
+            if ($this->conexion === null) {
+                $this->abrir_conexion();
+            }
+            return $this->conexion;
         }
 
         public function ejecutar_sentencia()
         {
-            $this->abrir_conexion();
-            $bandera = pg_query($this->conexion, $this->sentencia);
-            $this->cerrar_conexion();
+            $conexion = $this->getConexion();
+            $bandera = pg_query($conexion, $this->sentencia);
             return $bandera;
         }
 
         public function obtener_sentencia()
         {
-            $this->abrir_conexion();
-            $result = pg_query($this->conexion, $this->sentencia);
+            $conexion = $this->getConexion();
+            $result = pg_query($conexion, $this->sentencia);
             return $result;
         }
         
         public function obtener_ultimo_id()
         {
             // Para PostgreSQL, necesitamos una consulta específica
-            $this->abrir_conexion();
-            $result = pg_query($this->conexion, "SELECT lastval() as last_id");
+            $result = pg_query($this->getConexion(), "SELECT lastval() as last_id");
             if ($result) {
                 $row = pg_fetch_assoc($result);
-                $last_id = $row['last_id'];
-                $this->cerrar_conexion();
-                return $last_id;
+                return $row['last_id'] ?? null;
             }
-            $this->cerrar_conexion();
             return null;
         }
     }
