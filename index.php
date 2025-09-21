@@ -4,6 +4,7 @@ session_start();
 
 require_once 'config/database.php';
 require_once 'models/contacto.php';
+require_once 'models/user.php';
 
 // Si no está logueado, mostrar login
 if (!isset($_SESSION['user'])) {
@@ -16,6 +17,7 @@ $page = isset($_GET['url']) ? rtrim($_GET['url'], '/') : 'dashboard';
 $page = filter_var($page, FILTER_SANITIZE_URL);
 $url = explode('/', $page);
 
+$data = []; // Inicializar el array de datos para las vistas
 $content_view = 'views/dashboard_content.php'; // Vista por defecto
 
 switch ($url[0]) {
@@ -23,6 +25,8 @@ switch ($url[0]) {
         $content_view = 'views/dashboard_content.php';
         break;
     case 'usuarios':
+        $userModel = new User();
+        $data['users'] = $userModel->getUsers();
         $content_view = 'views/user_view.php';
         break;
     case 'servicios':
