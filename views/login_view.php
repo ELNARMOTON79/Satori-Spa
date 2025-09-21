@@ -12,11 +12,11 @@
         alert("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
     </script>
     <?php endif; ?>
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-8 flex flex-col items-center">
-        <img src="images/logo.png" alt="Satori Spa Logo" class="w-16 h-16 mb-4 rounded-full object-contain">
-        <h1 class="text-2xl font-semibold text-amber-900 mb-1 tracking-wide">SATORI SPA</h1>
-        <p class="text-gray-500 mb-6">Panel de Administración</p>
-        <form method="POST" action="controllers/logincontroller.php" class="w-full">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md pt-0 px-8 pb-8 flex flex-col items-center">
+        <img src="images/logo.png" alt="Satori Spa Logo" class="w-full object-contain mb-0 transform scale-125">
+        <h1 class="text-2xl font-semibold text-amber-900 mb-0 tracking-wide">SATORI SPA</h1>
+        <p class="text-gray-500 mb-0">Panel de Administración</p>
+        <form method="POST" action="controllers/logincontroller.php" class="w-full mt-4">
             <label class="block text-sm font-medium text-gray-700 mb-1" for="email">Email</label>
             <input name="email" id="email" type="email" class="mb-4 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent" placeholder="admin@satori.spa" required>
             <label class="block text-sm font-medium text-gray-700 mb-1" for="password">Contraseña</label>
