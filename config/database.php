@@ -52,6 +52,23 @@
             return $data ?: [];
         }
         
+        public function obtener_sentencia_preparada($params = [])
+        {
+            $this->abrir_conexion();
+            // pg_query_params es la forma segura de ejecutar consultas con parámetros en PostgreSQL.
+            $result = pg_query_params($this->conexion, $this->sentencia, $params);
+            
+            if (!$result) {
+                // Opcional: registrar el error pg_last_error($this->conexion)
+                $this->cerrar_conexion();
+                return [];
+            }
+
+            $data = pg_fetch_all($result, PGSQL_ASSOC);
+            $this->cerrar_conexion();
+            return $data ?: [];
+        }
+        
         public function obtener_ultimo_id()
         {
             return null;
