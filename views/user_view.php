@@ -48,7 +48,7 @@
     <div class="relative mx-auto p-8 border w-full max-w-lg shadow-lg rounded-xl bg-white">
         <div class="text-left">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold text-[#5C4633]">Añadir Nuevo Usuario</h3>
+                <h3 class="text-2xl font-bold text-[#5C4633]">Nuevo Usuario</h3>
                 <button onclick="closeModal('userModal')" class="text-gray-400 hover:text-gray-600">
                     <i class="fa-solid fa-times fa-lg"></i>
                 </button>
