@@ -35,6 +35,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
         exit();
     }
 
+} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userModel = new User();
+
+    // Eliminar usuario
+    if (isset($_POST['deleteUser']) && isset($_POST['id'])) {
+        $id = intval($_POST['id']);
+        $success = $userModel->deleteUser($id);
+        header('Location: ../index.php?url=usuarios' . ($success ? '&deleted=1' : '&error=1'));
+        exit();
+    }
+
+    // Editar usuario
+    if (isset($_POST['editUser']) && isset($_POST['id'])) {
+        $id = intval($_POST['id']);
+        $nombre = trim($_POST['nombre']);
+        $apellido = trim($_POST['apellido']);
+        $correo = trim($_POST['correo']);
+        $password = $_POST['password']; // No trim, can be empty
+        $id_rol = intval($_POST['id_rol']);
+        
+        // Validation
+        if (empty($nombre) || empty($apellido) || empty($correo) || empty($id_rol)) {
+            header('Location: ../index.php?url=usuarios&error=campos_vacios');
+            exit();
+        }
+
+        $success = $userModel->updateUser($id, $nombre, $apellido, $correo, $password, $id_rol);
+        header('Location: ../index.php?url=usuarios' . ($success ? '&updated=1' : '&error=1'));
+        exit();
+    }
+
 } else {
     // Si alguien intenta acceder a este archivo directamente, redirigirlo
     header('Location: ../index.php?url=usuarios');

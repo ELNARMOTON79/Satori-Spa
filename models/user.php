@@ -59,4 +59,41 @@ class User extends Conexion {
 
         return $resultado !== false;
     }
+
+    public function deleteUser($id) {
+        $sql = "DELETE FROM usuarios WHERE id = $1";
+        $conexion = $this->getConexion();
+        $stmt = pg_prepare($conexion, "delete_user_query", $sql);
+        $resultado = pg_execute($conexion, "delete_user_query", array($id));
+        return $resultado !== false;
+    }
+
+    public function updateUser($id, $nombre, $apellido, $correo, $password, $id_rol) {
+        $conexion = $this->getConexion();
+        if (!$conexion) {
+            return false;
+        }
+
+        if (!empty($password)) {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "UPDATE usuarios SET nombre=$1, apellido=$2, correo=$3, id_rol=$4, contrasena=$5 WHERE id=$6";
+            $params = [$nombre, $apellido, $correo, $id_rol, $hashed_password, $id];
+            $query_name = "update_user_with_pass_query";
+        } else {
+            $sql = "UPDATE usuarios SET nombre=$1, apellido=$2, correo=$3, id_rol=$4 WHERE id=$5";
+            $params = [$nombre, $apellido, $correo, $id_rol, $id];
+            $query_name = "update_user_without_pass_query";
+        }
+
+        $stmt = pg_prepare($conexion, $query_name, $sql);
+        if (!$stmt) {
+            // For debugging: error_log("Prepare failed: " . pg_last_error($conexion));
+            return false;
+        }
+
+        $resultado = pg_execute($conexion, $query_name, $params);
+        return $resultado !== false;
+    }
 }
+?>
+

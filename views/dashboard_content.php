@@ -1,4 +1,4 @@
-<!-- Cards -->
+
 <div class="grid grid-cols-4 gap-6 mb-8">
     <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9]">
         <div class="text-[#8C837B] mb-2">Total Usuarios</div>
