@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
 
     // 5. Redirigir al usuario con un mensaje de éxito o error
     if ($success) {
-        header('Location: ../index.php?url=usuarios&success=1');
+        header('Location: ../index.php?url=usuarios&created=1');
         exit();
     } else {
         header('Location: ../index.php?url=usuarios&error=1');

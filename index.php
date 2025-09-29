@@ -2,6 +2,11 @@
 
 session_start();
 
+// Headers para prevenir el caché del navegador
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
 require_once 'config/database.php';
 require_once 'models/contacto.php';
 require_once 'models/user.php';
@@ -42,26 +47,7 @@ ob_start();
 include 'views/admin_layout.php';
 echo ob_get_clean();
 ?>
-<!-- filepath: c:\xampp\htdocs\Satori-Spa\views\user_view.php -->
-<div class="bg-white rounded-xl shadow p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-[#5C4633]">Gestión de Usuarios</h2>
-        <!-- Botón para abrir el modal de crear usuario (puedes implementar este modal aparte) -->
-        <button onclick="openModal('userModal')" class="bg-amber-800 text-white px-4 py-2 rounded-lg hover:bg-amber-900">
-            + Nuevo Usuario
-        </button>
-    </div>
-    <table class="w-full text-left border-collapse">
-        <thead>
-            <tr class="bg-amber-100 text-amber-900">
-                <th class="p-3">Nombre</th>
-                <th class="p-3">Apellido</th>
-                <th class="p-3">Correo</th>
-                <th class="p-3">Teléfono</th>
-                <th class="p-3">Estado</th>
-                <th class="p-3">Acciones</th>
-            </tr>
-        </thead>
+
         <tbody>
             <?php if (!empty($users)): ?>
                 <?php foreach ($users as $user): ?>

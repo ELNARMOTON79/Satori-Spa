@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $success = $serviceModel->createService($nombre, $descripcion, $precio);
-        header('Location: ../index.php?url=servicios&success=' . ($success ? '1' : '0'));
+        header('Location: ../index.php?url=servicios&created=' . ($success ? '1' : '0'));
         exit();
     }
 
