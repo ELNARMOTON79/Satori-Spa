@@ -13,7 +13,7 @@
     </script>
     <?php endif; ?>
     <div class="bg-white rounded-xl shadow-lg w-full max-w-md pt-0 px-8 pb-8 flex flex-col items-center">
-        <img src="images/logo.png" alt="Satori Spa Logo" class="w-full object-contain mb-0 transform scale-125">
+        <img src="views/images/logo.png" alt="Satori Spa Logo" class="w-full object-contain mb-0 transform scale-125">
         <h1 class="text-2xl font-semibold text-amber-900 mb-0 tracking-wide">SATORI SPA</h1>
         <p class="text-gray-500 mb-0">Panel de Administración</p>
         <form method="POST" action="controllers/logincontroller.php" class="w-full mt-4">

@@ -1,4 +1,10 @@
 
+<!-- Welcome Header -->
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-[#5C4633]">Bienvenido, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Administrador'; ?></h1>
+    <p class="text-[#8C837B]">Aquí tienes un resumen de la actividad de tu spa.</p>
+</div>
+
 <div class="grid grid-cols-4 gap-6 mb-8">
     <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9]">
         <div class="text-[#8C837B] mb-2">Total Usuarios</div>

@@ -11,7 +11,7 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow h-screen flex flex-col">
             <div class="flex items-center px-6 py-4">
-                <img src="images/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
+                <img src="views/images/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
                 <div>
                     <h1 class="font-bold text-lg text-[#5C4633]">SATORI SPA</h1>
                     <span class="text-xs text-[#8C837B]">Panel de Administración</span>
@@ -46,7 +46,8 @@
             <div class="flex justify-between items-center mb-8">
                 <div></div>
                 <div class="text-right">
-                    <span class="text-[#5C4633]">Bienvenido, Administrador</span>
+                    <span class="text-[#5C4633]">Bienvenido, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Administrador'; ?></span>
+
                     <a href="controllers/logout.php" class="ml-4 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#E9DCCB] focus:outline-none inline-block">
                         <svg class="inline h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
                         Cerrar Sesión

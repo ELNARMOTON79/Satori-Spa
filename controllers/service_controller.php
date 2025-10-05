@@ -16,6 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
+        // Validation for special characters
+        if (!preg_match('/^[a-zA-Z0-9\s.,]+$/', $nombre) || !preg_match('/^[a-zA-Z0-9\s.,]+$/', $descripcion)) {
+            header('Location: ../index.php?url=servicios&error=caracteres_especiales');
+            exit();
+        }
+
+        if (!is_numeric($precio) || $precio <= 0 || $precio > 99999.99) {
+            header('Location: ../index.php?url=servicios&error=precio_invalido');
+            exit();
+        }
+
         $success = $serviceModel->createService($nombre, $descripcion, $precio);
         header('Location: ../index.php?url=servicios&created=' . ($success ? '1' : '0'));
         exit();
@@ -30,6 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($nombre) || empty($descripcion) || empty($precio)) {
             header('Location: ../index.php?url=servicios&error=campos_vacios');
+            exit();
+        }
+
+        // Validation for special characters
+        if (!preg_match('/^[a-zA-Z0-9\s.,]+$/', $nombre) || !preg_match('/^[a-zA-Z0-9\s.,]+$/', $descripcion)) {
+            header('Location: ../index.php?url=servicios&error=caracteres_especiales');
+            exit();
+        }
+
+        if (!is_numeric($precio)) {
+            header('Location: ../index.php?url=servicios&error=precio_invalido');
             exit();
         }
 

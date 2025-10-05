@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // Incluir el modelo de usuario para poder usarlo
 require_once __DIR__ . '/../models/user.php';
@@ -17,6 +18,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
     if (empty($nombre) || empty($apellido) || empty($correo) || empty($password) || empty($id_rol)) {
         // Si algún campo está vacío, redirigir con un mensaje de error
         header('Location: ../index.php?url=usuarios&error=campos_vacios');
+        exit();
+    }
+
+    // Additional validation
+    if (!preg_match('/^[a-zA-Z\s]+$/', $nombre) || !preg_match('/^[a-zA-Z\s]+$/', $apellido)) {
+        header('Location: ../index.php?url=usuarios&error=nombre_invalido');
+        exit();
+    }
+
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        header('Location: ../index.php?url=usuarios&error=correo_invalido');
+        exit();
+    }
+
+    if (!preg_match('/^[a-zA-Z0-9]{8,16}$/', $password)) {
+        header('Location: ../index.php?url=usuarios&error=password_invalido');
+        exit();
+    }
+
+    if (!filter_var($id_rol, FILTER_VALIDATE_INT)) {
+        header('Location: ../index.php?url=usuarios&error=rol_invalido');
         exit();
     }
 
@@ -61,7 +83,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
             exit();
         }
 
-        $success = $userModel->updateUser($id, $nombre, $apellido, $correo, $password, $id_rol);
+        if (!preg_match('/^[a-zA-Z\s]+$/', $nombre) || !preg_match('/^[a-zA-Z\s]+$/', $apellido)) {
+            header('Location: ../index.php?url=usuarios&error=nombre_invalido');
+            exit();
+        }
+
+        if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            header('Location: ../index.php?url=usuarios&error=correo_invalido');
+            exit();
+        }
+
+        if (!empty($password) && !preg_match('/^[a-zA-Z0-9]{8,16}$/', $password)) {
+            header('Location: ../index.php?url=usuarios&error=password_invalido');
+            exit();
+        }
+
+        if (!filter_var($id_rol, FILTER_VALIDATE_INT)) {
+            header('Location: ../index.php?url=usuarios&error=rol_invalido');
+            exit();
+        }
+
+                $success = $userModel->updateUser($id, $nombre, $apellido, $correo, $password, $id_rol);
+        if ($success && isset($_SESSION['user']) && $_SESSION['user'] === $correo) {
+            $_SESSION['user_name'] = $nombre;
+        }
         header('Location: ../index.php?url=usuarios' . ($success ? '&updated=1' : '&error=1'));
         exit();
     }

@@ -10,10 +10,10 @@ if (isset($_GET['created']) && $_GET['created'] == 1) {
           </div>';
 }
 if (isset($_GET['updated']) && $_GET['updated'] == 1) {
-    echo '<div class="auto-hide-alert bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+    echo '<div class="auto-hide-alert bg-green-200 border border-green-500 text-green-800 px-4 py-3 rounded relative mb-4" role="alert">
             <strong class="font-bold">¡Éxito!</strong>
             <span class="block sm:inline">El servicio ha sido actualizado correctamente.</span>
-            <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display=\'none\';"><svg class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg></span>
+            <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display=\'none\';"><svg class="fill-current h-6 w-6 text-green-600" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg></span>
           </div>';
 }
 if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
@@ -66,7 +66,7 @@ if (isset($_GET['error'])) {
                                     <i class="fa-solid fa-pencil"></i>
                                 </button>
                                 <form method="POST" action="controllers/service_controller.php" style="display:inline;" 
-                                    onsubmit="return confirm('¿Seguro que deseas eliminar este servicio?');">
+                                    onsubmit="event.preventDefault(); openConfirmationModal('¿Seguro que deseas eliminar este servicio?', () => this.submit());">
                                     <input type="hidden" name="deleteService" value="1">
                                     <input type="hidden" name="id" value="<?= $service['id'] ?>">
                                     <button type="submit" class="text-red-600" title="Eliminar" style="background:none;border:none;padding:0;">
@@ -104,7 +104,7 @@ if (isset($_GET['error'])) {
                 </div>
                 <div>
                     <label for="precio" class="block text-sm font-medium text-gray-700 mb-1">Precio</label>
-                    <input type="number" id="precio" name="precio" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <input type="number" id="precio" name="precio" step="0.01" min="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                 </div>
                 <div class="flex items-center justify-end gap-4 pt-4">
                     <button type="button" onclick="closeModal('serviceModal')" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg">Cancelar</button>
@@ -120,7 +120,7 @@ if (isset($_GET['error'])) {
     <div class="bg-white rounded-xl p-8 w-full max-w-lg relative">
         <button onclick="closeEditServiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">&times;</button>
         <h3 class="text-2xl font-bold text-[#5C4633] mb-4">Editar Servicio</h3>
-        <form method="POST" action="controllers/service_controller.php" class="space-y-4" onsubmit="return confirm('¿Estás seguro de que quieres guardar estos cambios?');">
+        <form method="POST" action="controllers/service_controller.php" class="space-y-4" onsubmit="event.preventDefault(); openConfirmationModal('¿Estás seguro de que quieres guardar estos cambios?', () => this.submit());">
             <input type="hidden" name="editService" value="1">
             <input type="hidden" name="id" id="edit_service_id">
             <div>
@@ -133,13 +133,26 @@ if (isset($_GET['error'])) {
             </div>
             <div>
                 <label for="edit_precio" class="block text-sm font-medium text-gray-700 mb-1">Precio</label>
-                <input type="number" id="edit_precio" name="precio" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                <input type="number" id="edit_precio" name="precio" step="0.01" min="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
             </div>
             <div class="flex items-center justify-end gap-4 pt-4">
                 <button type="button" onclick="closeEditServiceModal()" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg">Cancelar</button>
                 <button type="submit" class="px-6 py-2 bg-[#5C4633] text-white rounded-lg hover:bg-[#4A3829]">Guardar Cambios</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
+    <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white">
+        <div class="text-center">
+            <h3 id="confirmationMessage" class="text-lg font-medium text-gray-900"></h3>
+            <div class="mt-4 flex justify-center gap-4">
+                <button id="confirmButton" class="px-6 py-2 bg-red-600 text-white rounded-lg">Confirmar</button>
+                <button id="cancelButton" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg">Cancelar</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -159,6 +172,24 @@ function openEditServiceModal(service) {
 }
 function closeEditServiceModal() {
     document.getElementById('editServiceModal').classList.add('hidden');
+}
+
+function openConfirmationModal(message, onConfirm) {
+    document.getElementById('confirmationMessage').textContent = message;
+    document.getElementById('confirmationModal').classList.remove('hidden');
+
+    document.getElementById('confirmButton').onclick = function() {
+        onConfirm();
+        closeConfirmationModal();
+    };
+
+    document.getElementById('cancelButton').onclick = function() {
+        closeConfirmationModal();
+    };
+}
+
+function closeConfirmationModal() {
+    document.getElementById('confirmationModal').classList.add('hidden');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
