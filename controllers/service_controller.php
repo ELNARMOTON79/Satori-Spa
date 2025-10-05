@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 require_once __DIR__ . '/../models/service.php';
 
@@ -11,25 +12,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $descripcion = trim($_POST['descripcion']);
         $precio = trim($_POST['precio']);
 
-        if (empty($nombre) || empty($descripcion) || empty($precio)) {
-            header('Location: ../index.php?url=servicios&error=campos_vacios');
-            exit();
+        $errors = [];
+        if (empty($nombre)) {
+            $errors['nombre'] = 'El nombre es obligatorio.';
+        } elseif (!preg_match('/^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ]+$/u', $nombre)) {
+            $errors['nombre'] = 'El nombre solo puede contener letras, números y los siguientes caracteres: . ,';
         }
 
-        // Validation for special characters
-        if (!preg_match('/^[a-zA-Z0-9\s.,]+$/', $nombre) || !preg_match('/^[a-zA-Z0-9\s.,]+$/', $descripcion)) {
-            header('Location: ../index.php?url=servicios&error=caracteres_especiales');
-            exit();
+        if (empty($descripcion)) {
+            $errors['descripcion'] = 'La descripción es obligatoria.';
+        } elseif (!preg_match('/^[a-zA-Z\s_áéíóúÁÉÍÓÚñÑ]+$/u', $descripcion)) {
+            $errors['descripcion'] = 'La descripción solo puede contener letras y espacios.';
         }
 
-        if (!is_numeric($precio) || $precio <= 0 || $precio > 99999.99) {
-            header('Location: ../index.php?url=servicios&error=precio_invalido');
-            exit();
+        if (empty($precio)) {
+            $errors['precio'] = 'El precio es obligatorio.';
+        } elseif (!filter_var($precio, FILTER_VALIDATE_FLOAT) || $precio <= 0) {
+            $errors['precio'] = 'El precio debe ser un número positivo.';
+        } elseif ($precio > 10000) {
+            $errors['precio'] = 'El precio no puede exceder los $10,000.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['form_data'] = $_POST;
+            $_SESSION['form_errors'] = $errors;
+            $_SESSION['open_add_modal'] = true;
+            header('Location: ../index.php?url=servicios');
+            exit;
         }
 
         $success = $serviceModel->createService($nombre, $descripcion, $precio);
-        header('Location: ../index.php?url=servicios&created=' . ($success ? '1' : '0'));
-        exit();
+        $param = $success ? 'created=1' : 'error=1';
+        header('Location: ../index.php?url=servicios&' . $param);
+        exit;
     }
 
     // Edit service
@@ -39,32 +54,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $descripcion = trim($_POST['descripcion']);
         $precio = trim($_POST['precio']);
 
-        if (empty($nombre) || empty($descripcion) || empty($precio)) {
-            header('Location: ../index.php?url=servicios&error=campos_vacios');
-            exit();
+        $errors = [];
+        if (empty($nombre)) {
+            $errors['nombre'] = 'El nombre es obligatorio.';
+        } elseif (!preg_match('/^[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ]+$/u', $nombre)) {
+            $errors['nombre'] = 'El nombre solo puede contener letras, números y los siguientes caracteres: . ,';
         }
 
-        // Validation for special characters
-        if (!preg_match('/^[a-zA-Z0-9\s.,]+$/', $nombre) || !preg_match('/^[a-zA-Z0-9\s.,]+$/', $descripcion)) {
-            header('Location: ../index.php?url=servicios&error=caracteres_especiales');
-            exit();
+        if (empty($descripcion)) {
+            $errors['descripcion'] = 'La descripción es obligatoria.';
+        } elseif (!preg_match('/^[a-zA-Z\s_áéíóúÁÉÍÓÚñÑ]+$/u', $descripcion)) {
+            $errors['descripcion'] = 'La descripción solo puede contener letras y espacios.';
         }
 
-        if (!is_numeric($precio)) {
-            header('Location: ../index.php?url=servicios&error=precio_invalido');
-            exit();
+        if (empty($precio)) {
+            $errors['precio'] = 'El precio es obligatorio.';
+        } elseif (!filter_var($precio, FILTER_VALIDATE_FLOAT) || $precio <= 0) {
+            $errors['precio'] = 'El precio debe ser un número positivo.';
+        } elseif ($precio > 10000) {
+            $errors['precio'] = 'El precio no puede exceder los $10,000.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['edit_form_data'] = $_POST;
+            $_SESSION['edit_form_errors'] = $errors;
+            $_SESSION['open_edit_modal'] = $id;
+            header('Location: ../index.php?url=servicios');
+            exit;
         }
 
         $success = $serviceModel->updateService($id, $nombre, $descripcion, $precio);
-        header('Location: ../index.php?url=servicios&updated=' . ($success ? '1' : '0'));
-        exit();
+        $param = $success ? 'updated=1' : 'error=1';
+        header('Location: ../index.php?url=servicios&' . $param);
+        exit;
     }
 
     // Delete service
     if (isset($_POST['deleteService']) && isset($_POST['id'])) {
         $id = intval($_POST['id']);
         $success = $serviceModel->deleteService($id);
-        header('Location: ../index.php?url=servicios&deleted=' . ($success ? '1' : '0'));
+        header('Location: ../index.php?url=servicios' . ($success ? '&deleted=1' : '&error=1'));
         exit();
     }
 }
