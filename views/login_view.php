@@ -28,7 +28,7 @@
                     </svg>
                 </span>
             </div>
-            <button type="submit" name="login" class="w-full bg-amber-800 text-white py-3 rounded-lg font-semibold hover:bg-amber-900 transition-colors duration-200">
+            <button type="submit" name="login" class="w-full bg-[#5C4633] text-white py-3 rounded-lg font-semibold hover:bg-[#4A3829] transition-colors duration-200">
                 Iniciar Sesión
             </button>   
         </form>

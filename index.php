@@ -40,6 +40,12 @@ switch ($url[0]) {
         $data['services'] = $serviceModel->getServices();
         $content_view = 'views/service_view.php';
         break;
+    case 'nfc':
+        require_once 'controllers/nfc_controller.php';
+        $controller = new NfcController($conexion);
+        $controller->index(); // Llamar al método para mostrar la vista
+        exit; // Detener la ejecución para no cargar el layout principal
+
 }
 
 // Permite usar las variables PHP dentro de la vista HTML

@@ -14,31 +14,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
     $password = $_POST['password']; // La contraseña no se trimea
     $id_rol = $_POST['id_rol'];
 
-    // 2. Validación básica de los datos
-    if (empty($nombre) || empty($apellido) || empty($correo) || empty($password) || empty($id_rol)) {
-        // Si algún campo está vacío, redirigir con un mensaje de error
-        header('Location: ../index.php?url=usuarios&error=campos_vacios');
-        exit();
+    // 2. Validación de los datos
+    $errors = [];
+    if (empty($nombre)) {
+        $errors['nombre'] = 'El nombre es obligatorio.';
+    } elseif (!preg_match('/^[a-zA-Z\s]+$/', $nombre)) {
+        $errors['nombre'] = 'El nombre solo puede contener letras y espacios.';
     }
 
-    // Additional validation
-    if (!preg_match('/^[a-zA-Z\s]+$/', $nombre) || !preg_match('/^[a-zA-Z\s]+$/', $apellido)) {
-        header('Location: ../index.php?url=usuarios&error=nombre_invalido');
-        exit();
+    if (empty($apellido)) {
+        $errors['apellido'] = 'El apellido es obligatorio.';
+    } elseif (!preg_match('/^[a-zA-Z\s]+$/', $apellido)) {
+        $errors['apellido'] = 'El apellido solo puede contener letras y espacios.';
     }
 
-    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        header('Location: ../index.php?url=usuarios&error=correo_invalido');
-        exit();
+    if (empty($correo)) {
+        $errors['correo'] = 'El correo electrónico es obligatorio.';
+    } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        $errors['correo'] = 'El formato del correo electrónico no es válido.';
     }
 
-    if (!preg_match('/^[a-zA-Z0-9]{8,16}$/', $password)) {
-        header('Location: ../index.php?url=usuarios&error=password_invalido');
-        exit();
+    if (empty($password)) {
+        $errors['password'] = 'La contraseña es obligatoria.';
+    } elseif (!preg_match('/^[a-zA-Z0-9]{8,16}$/', $password)) {
+        $errors['password'] = 'La contraseña debe tener entre 8 y 16 caracteres alfanuméricos.';
     }
 
-    if (!filter_var($id_rol, FILTER_VALIDATE_INT)) {
-        header('Location: ../index.php?url=usuarios&error=rol_invalido');
+    if (empty($id_rol)) {
+        $errors['id_rol'] = 'El rol es obligatorio.';
+    } elseif (!filter_var($id_rol, FILTER_VALIDATE_INT)) {
+        $errors['id_rol'] = 'El rol seleccionado no es válido.';
+    }
+
+    // Si hay errores, guardar los datos y errores en la sesión y redirigir
+    if (!empty($errors)) {
+        $_SESSION['form_data'] = $_POST;
+        $_SESSION['form_errors'] = $errors;
+        $_SESSION['open_add_modal'] = true; // Reabrir el modal en error de validación
+        header('Location: ../index.php?url=usuarios');
         exit();
     }
 
@@ -50,9 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
 
     // 5. Redirigir al usuario con un mensaje de éxito o error
     if ($success) {
+        unset($_SESSION['form_data']); // Limpiar datos del formulario en éxito
         header('Location: ../index.php?url=usuarios&created=1');
         exit();
     } else {
+        // Si la creación falla (p.ej. correo duplicado), guardamos los datos
+        // y errores en la sesión para repoblar el formulario.
+        $_SESSION['form_data'] = $_POST;
+        $_SESSION['form_errors']['general'] = 'No se pudo crear el usuario. El correo electrónico ya podría estar en uso.';
+        $_SESSION['open_add_modal'] = true; // Reabrir el modal
         header('Location: ../index.php?url=usuarios&error=1');
         exit();
     }
@@ -78,36 +97,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addUser'])) {
         $id_rol = intval($_POST['id_rol']);
         
         // Validation
-        if (empty($nombre) || empty($apellido) || empty($correo) || empty($id_rol)) {
-            header('Location: ../index.php?url=usuarios&error=campos_vacios');
-            exit();
+        $errors = [];
+        if (empty($nombre)) {
+            $errors['nombre'] = 'El nombre es obligatorio.';
+        } elseif (!preg_match('/^[a-zA-Z\s]+$/', $nombre)) {
+            $errors['nombre'] = 'El nombre solo puede contener letras y espacios.';
         }
 
-        if (!preg_match('/^[a-zA-Z\s]+$/', $nombre) || !preg_match('/^[a-zA-Z\s]+$/', $apellido)) {
-            header('Location: ../index.php?url=usuarios&error=nombre_invalido');
-            exit();
+        if (empty($apellido)) {
+            $errors['apellido'] = 'El apellido es obligatorio.';
+        } elseif (!preg_match('/^[a-zA-Z\s]+$/', $apellido)) {
+            $errors['apellido'] = 'El apellido solo puede contener letras y espacios.';
         }
 
-        if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-            header('Location: ../index.php?url=usuarios&error=correo_invalido');
-            exit();
+        if (empty($correo)) {
+            $errors['correo'] = 'El correo electrónico es obligatorio.';
+        } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            $errors['correo'] = 'El formato del correo electrónico no es válido.';
         }
 
         if (!empty($password) && !preg_match('/^[a-zA-Z0-9]{8,16}$/', $password)) {
-            header('Location: ../index.php?url=usuarios&error=password_invalido');
+            $errors['password'] = 'La contraseña debe tener entre 8 y 16 caracteres alfanuméricos.';
+        }
+
+        if (empty($id_rol)) {
+            $errors['id_rol'] = 'El rol es obligatorio.';
+        } elseif (!filter_var($id_rol, FILTER_VALIDATE_INT)) {
+            $errors['id_rol'] = 'El rol seleccionado no es válido.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['edit_form_data'] = $_POST;
+            $_SESSION['edit_form_errors'] = $errors;
+            $_SESSION['open_edit_modal'] = $id;
+            header('Location: ../index.php?url=usuarios');
             exit();
         }
 
-        if (!filter_var($id_rol, FILTER_VALIDATE_INT)) {
-            header('Location: ../index.php?url=usuarios&error=rol_invalido');
-            exit();
-        }
-
-                $success = $userModel->updateUser($id, $nombre, $apellido, $correo, $password, $id_rol);
+        $success = $userModel->updateUser($id, $nombre, $apellido, $correo, $password, $id_rol);
         if ($success && isset($_SESSION['user']) && $_SESSION['user'] === $correo) {
             $_SESSION['user_name'] = $nombre;
         }
-        header('Location: ../index.php?url=usuarios' . ($success ? '&updated=1' : '&error=1'));
+        // Si la actualización falla (ej. correo duplicado), también mostramos un error.
+        if ($success) {
+            header('Location: ../index.php?url=usuarios&updated=1');
+        } else {
+            // Si la actualización falla (ej. correo duplicado), guardar datos y errores para reabrir el modal de edición
+            $_SESSION['edit_form_data'] = $_POST;
+            $_SESSION['edit_form_errors']['general'] = 'No se pudo actualizar el usuario. Es posible que el correo ya esté en uso.';
+            $_SESSION['open_edit_modal'] = $id;
+            header('Location: ../index.php?url=usuarios&error=1'); // Añadir &error=1 para la alerta global
+        }
         exit();
     }
 

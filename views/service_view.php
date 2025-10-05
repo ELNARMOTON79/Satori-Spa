@@ -117,9 +117,11 @@ if (isset($_GET['error'])) {
 
 <!-- Modal de edición de servicio -->
 <div id="editServiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-xl p-8 w-full max-w-lg relative">
-        <button onclick="closeEditServiceModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">&times;</button>
-        <h3 class="text-2xl font-bold text-[#5C4633] mb-4">Editar Servicio</h3>
+    <div class="relative mx-auto p-8 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-2xl font-bold text-[#5C4633]">Editar Servicio</h3>
+            <button onclick="closeEditServiceModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times fa-lg"></i></button>
+        </div>
         <form method="POST" action="controllers/service_controller.php" class="space-y-4" onsubmit="event.preventDefault(); openConfirmationModal('¿Estás seguro de que quieres guardar estos cambios?', () => this.submit());">
             <input type="hidden" name="editService" value="1">
             <input type="hidden" name="id" id="edit_service_id">
@@ -149,8 +151,8 @@ if (isset($_GET['error'])) {
         <div class="text-center">
             <h3 id="confirmationMessage" class="text-lg font-medium text-gray-900"></h3>
             <div class="mt-4 flex justify-center gap-4">
-                <button id="confirmButton" class="px-6 py-2 bg-red-600 text-white rounded-lg">Confirmar</button>
-                <button id="cancelButton" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg">Cancelar</button>
+                <button id="confirmButton" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Confirmar</button>
+                <button id="cancelButton" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Cancelar</button>
             </div>
         </div>
     </div>
