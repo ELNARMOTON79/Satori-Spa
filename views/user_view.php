@@ -78,19 +78,19 @@ foreach ($messages as $key => $message) {
                             <td class="p-3"><?= htmlspecialchars($user['nombre']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($user['apellido']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($user['correo']) ?></td>
-                            <td class="p-3 flex gap-2">
+                            <td class="p-3 flex gap-4 items-center">
                                 <!-- Botón Editar -->
-                                <button type="button" class="text-amber-700" title="Editar"
+                                <button type="button" class="text-amber-700 hover:text-amber-900 transition-colors" title="Editar"
                                     onclick="openEditModal(<?= htmlspecialchars(json_encode($user), ENT_QUOTES, 'UTF-8') ?>)">
-                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-pencil fa-lg"></i>
                                 </button>
                                 <!-- Botón Eliminar -->
                                 <form method="POST" action="controllers/user_controller.php" style="display:inline;" 
                                     onsubmit="event.preventDefault(); openConfirmationModal('¿Seguro que deseas eliminar este usuario?', () => this.submit());">
                                     <input type="hidden" name="deleteUser" value="1">
                                     <input type="hidden" name="id" value="<?= $user['id'] ?>">
-                                    <button type="submit" class="text-red-600" title="Eliminar" style="background:none;border:none;padding:0;">
-                                        <i class="fa-solid fa-trash"></i>
+                                    <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Eliminar" style="background:none;border:none;padding:0;">
+                                        <i class="fa-solid fa-trash fa-lg"></i>
                                     </button>
                                 </form>
                             </td>
@@ -249,15 +249,19 @@ unset($_SESSION['edit_form_errors'], $_SESSION['edit_form_data'], $_SESSION['ope
 
 <!-- Confirmation Modal -->
 <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
-    <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white text-center">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-[#5C4633]">Confirmar Acción</h3>
-            <button onclick="closeConfirmationModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times fa-lg"></i></button>
-        </div>
-        <p id="confirmationMessage" class="text-gray-600 my-4"></p>
-        <div class="mt-6 flex justify-center gap-4">
-            <button id="confirmButton" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Confirmar</button>
-            <button id="cancelButton" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Cancelar</button>
+    <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white">
+        <div class="text-center p-5 flex-auto justify-center">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 fa-4x mx-auto mb-4"></i>
+            <h3 id="confirmationMessage" class="text-xl font-bold text-gray-800 mt-2"></h3>
+            <p class="text-sm text-gray-500 px-8">¿Estás seguro? Esta acción no se puede deshacer.</p>
+            <div class="mt-6 flex justify-center gap-4">
+                <button id="cancelButton" class="flex items-center px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <i class="fa-solid fa-times mr-2"></i> Cancelar
+                </button>
+                <button id="confirmButton" class="flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-check mr-2"></i> Confirmar
+                </button>
+            </div>
         </div>
     </div>
 </div>

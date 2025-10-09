@@ -78,17 +78,17 @@ if (isset($_GET['error'])) {
                             <td class="p-3"><?= htmlspecialchars($service['nombre_servicio']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($service['descripcion']) ?></td>
                             <td class="p-3">$<?= htmlspecialchars(number_format($service['precio'], 2)) ?></td>
-                            <td class="p-3 flex gap-2">
-                                <button type="button" class="text-amber-700" title="Editar"
+                            <td class="p-3 flex gap-4 items-center">
+                                <button type="button" class="text-amber-700 hover:text-amber-900 transition-colors" title="Editar"
                                     onclick="openEditServiceModal(<?= htmlspecialchars(json_encode($service), ENT_QUOTES, 'UTF-8') ?>)">
-                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-pencil fa-lg"></i>
                                 </button>
                                 <form method="POST" action="controllers/service_controller.php" style="display:inline;" 
                                     onsubmit="event.preventDefault(); openConfirmationModal('¿Seguro que deseas eliminar este servicio?', () => this.submit());">
                                     <input type="hidden" name="deleteService" value="1">
                                     <input type="hidden" name="id" value="<?= $service['id'] ?>">
-                                    <button type="submit" class="text-red-600" title="Eliminar" style="background:none;border:none;padding:0;">
-                                        <i class="fa-solid fa-trash"></i>
+                                    <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Eliminar" style="background:none;border:none;padding:0;">
+                                        <i class="fa-solid fa-trash fa-lg"></i>
                                     </button>
                                 </form>
                             </td>
@@ -128,7 +128,7 @@ unset($_SESSION['form_errors'], $_SESSION['form_data'], $_SESSION['open_add_moda
                 </div>
                 <div>
                     <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                    <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required><?= htmlspecialchars($form_data['descripcion'] ?? '') ?></textarea>
+                    <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="50"><?= htmlspecialchars($form_data['descripcion'] ?? '') ?></textarea>
                     <?php if (isset($form_errors['descripcion'])): ?>
                         <p class="text-red-500 text-xs mt-1"><?= $form_errors['descripcion'] ?></p>
                     <?php endif; ?>
@@ -174,7 +174,7 @@ unset($_SESSION['edit_form_errors'], $_SESSION['edit_form_data'], $_SESSION['ope
             </div>
             <div>
                 <label for="edit_descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required><?= htmlspecialchars($edit_form_data['descripcion'] ?? '') ?></textarea>
+                <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="50"><?= htmlspecialchars($edit_form_data['descripcion'] ?? '') ?></textarea>
                 <?php if (isset($edit_form_errors['descripcion'])): ?>
                     <p class="text-red-500 text-xs mt-1"><?= $edit_form_errors['descripcion'] ?></p>
                 <?php endif; ?>
@@ -197,11 +197,17 @@ unset($_SESSION['edit_form_errors'], $_SESSION['edit_form_data'], $_SESSION['ope
 <!-- Confirmation Modal -->
 <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
     <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white">
-        <div class="text-center">
-            <h3 id="confirmationMessage" class="text-lg font-medium text-gray-900"></h3>
-            <div class="mt-4 flex justify-center gap-4">
-                <button id="confirmButton" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Confirmar</button>
-                <button id="cancelButton" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Cancelar</button>
+        <div class="text-center p-5 flex-auto justify-center">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 fa-4x mx-auto mb-4"></i>
+            <h3 id="confirmationMessage" class="text-xl font-bold text-gray-800 mt-2"></h3>
+            <p class="text-sm text-gray-500 px-8">¿Estás seguro? Esta acción no se puede deshacer.</p>
+            <div class="mt-6 flex justify-center gap-4">
+                <button id="cancelButton" class="flex items-center px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <i class="fa-solid fa-times mr-2"></i> Cancelar
+                </button>
+                <button id="confirmButton" class="flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-check mr-2"></i> Confirmar
+                </button>
             </div>
         </div>
     </div>
