@@ -110,7 +110,6 @@ unset($_SESSION['form_errors'], $_SESSION['form_data'], $_SESSION['open_add_moda
                 </div>
                 <div>
                     <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                    <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required><?= htmlspecialchars($form_data['descripcion'] ?? '') ?></textarea>
                     <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="50"><?= htmlspecialchars($form_data['descripcion'] ?? '') ?></textarea>
                     <?php if (isset($form_errors['descripcion'])): ?>
                         <p class="text-red-500 text-xs mt-1"><?= $form_errors['descripcion'] ?></p>
@@ -157,7 +156,6 @@ unset($_SESSION['edit_form_errors'], $_SESSION['edit_form_data'], $_SESSION['ope
             </div>
             <div>
                 <label for="edit_descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required><?= htmlspecialchars($edit_form_data['descripcion'] ?? '') ?></textarea>
                 <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="50"><?= htmlspecialchars($edit_form_data['descripcion'] ?? '') ?></textarea>
                 <?php if (isset($edit_form_errors['descripcion'])): ?>
                     <p class="text-red-500 text-xs mt-1"><?= $edit_form_errors['descripcion'] ?></p>

@@ -39,7 +39,7 @@ class User extends Conexion {
         // Hashear la contraseña por seguridad
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        $sql = "INSERT INTO usuarios (nombre, apellido, correo, contrasena, id_rol) VALUES ($1, $2, $3, $4, $5)";
+        $sql = "INSERT INTO usuarios (nombre, apellido, correo, contrasena, id_rol, fecha_creacion) VALUES ($1, $2, $3, $4, $5, NOW())";
         
         $conexion = $this->getConexion();
         if (!$conexion) {
@@ -94,6 +94,35 @@ class User extends Conexion {
         $resultado = pg_execute($conexion, $query_name, $params);
         return $resultado !== false;
     }
+    public function getRecentUsers() {
+    $conexion = $this->getConexion();
+    if (!$conexion) {
+        return [];
+    }
+
+    // Como no hay campo de fecha, usamos la función NOW() para simular la fecha
+    $sql = "SELECT nombre || ' ' || apellido AS descripcion, 
+                   'usuario' AS tipo, 
+                   NOW() AS fecha 
+            FROM usuarios 
+            ORDER BY id DESC 
+            LIMIT 20";
+
+    $resultado = pg_query($conexion, $sql);
+    if (!$resultado) {
+        return [];
+    }
+
+    $data = [];
+    while ($row = pg_fetch_assoc($resultado)) {
+        $data[] = $row;
+    }
+
+    // ❌ No cerramos aquí la conexión (tu clase ya lo hace)
+    return $data;
+}
+
+
 }
 ?>
 

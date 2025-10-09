@@ -22,8 +22,7 @@ class Service extends Conexion {
     }
 
     public function createService($nombre, $descripcion, $precio) {
-        $sql = 'INSERT INTO servicios (nombre_servicio, descripcion, precio) VALUES ($1, $2, $3)';
-        
+        $sql = "INSERT INTO servicios (nombre_servicio, descripcion, precio, fecha_creacion) VALUES ($1, $2, $3, NOW())";
         $conexion = $this->getConexion();
         if (!$conexion) {
             return false;
@@ -64,5 +63,33 @@ class Service extends Conexion {
         $resultado = pg_execute($conexion, $stmt_name, array($id));
         return $resultado !== false;
     }
+    public function getRecentServices() {
+    $conexion = $this->getConexion();
+    if (!$conexion) {
+        return [];
+    }
+
+    $sql = "SELECT nombre_servicio AS descripcion, 
+                   'servicio' AS tipo, 
+                   NOW() AS fecha 
+            FROM servicios 
+            ORDER BY id DESC 
+            LIMIT 20";
+
+    $resultado = pg_query($conexion, $sql);
+    if (!$resultado) {
+        return [];
+    }
+
+    $data = [];
+    while ($row = pg_fetch_assoc($resultado)) {
+        $data[] = $row;
+    }
+
+    // No cerramos la conexión aquí
+    return $data;
+}
+
+
 }
 ?>

@@ -27,7 +27,17 @@ $content_view = 'views/dashboard_content.php'; // Vista por defecto
 
 switch ($url[0]) {
     case 'dashboard':
+        $data['dashboard'] = true;
         $content_view = 'views/dashboard_content.php';
+
+        // Fetch data for the dashboard
+        $userModel = new User();
+        require_once 'models/service.php';
+        $serviceModel = new Service();
+
+        $data['totalUsuarios'] = count($userModel->getUsers());
+        $data['totalServicios'] = count($serviceModel->getServices());
+        $data['totalCitas'] = 10; // Replace with your actual citas count logic
         break;
     case 'usuarios':
         $userModel = new User();
@@ -45,6 +55,8 @@ switch ($url[0]) {
         $controller = new NfcController($conexion);
         $controller->index(); // Llamar al método para mostrar la vista
         exit; // Detener la ejecución para no cargar el layout principal
+    
+        
 
 }
 
