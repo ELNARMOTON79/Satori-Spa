@@ -111,6 +111,7 @@ unset($_SESSION['form_errors'], $_SESSION['form_data'], $_SESSION['open_add_moda
                 <div>
                     <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                     <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required><?= htmlspecialchars($form_data['descripcion'] ?? '') ?></textarea>
+                    <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="50"><?= htmlspecialchars($form_data['descripcion'] ?? '') ?></textarea>
                     <?php if (isset($form_errors['descripcion'])): ?>
                         <p class="text-red-500 text-xs mt-1"><?= $form_errors['descripcion'] ?></p>
                     <?php endif; ?>
@@ -157,6 +158,7 @@ unset($_SESSION['edit_form_errors'], $_SESSION['edit_form_data'], $_SESSION['ope
             <div>
                 <label for="edit_descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                 <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required><?= htmlspecialchars($edit_form_data['descripcion'] ?? '') ?></textarea>
+                <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="50"><?= htmlspecialchars($edit_form_data['descripcion'] ?? '') ?></textarea>
                 <?php if (isset($edit_form_errors['descripcion'])): ?>
                     <p class="text-red-500 text-xs mt-1"><?= $edit_form_errors['descripcion'] ?></p>
                 <?php endif; ?>
@@ -179,11 +181,17 @@ unset($_SESSION['edit_form_errors'], $_SESSION['edit_form_data'], $_SESSION['ope
 <!-- Confirmation Modal -->
 <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
     <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white">
-        <div class="text-center">
-            <h3 id="confirmationMessage" class="text-lg font-medium text-gray-900"></h3>
-            <div class="mt-4 flex justify-center gap-4">
-                <button id="confirmButton" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Confirmar</button>
-                <button id="cancelButton" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Cancelar</button>
+        <div class="text-center p-5 flex-auto justify-center">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 fa-4x mx-auto mb-4"></i>
+            <h3 id="confirmationMessage" class="text-xl font-bold text-gray-800 mt-2"></h3>
+            <p class="text-sm text-gray-500 px-8">¿Estás seguro? Esta acción no se puede deshacer.</p>
+            <div class="mt-6 flex justify-center gap-4">
+                <button id="cancelButton" class="flex items-center px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <i class="fa-solid fa-times mr-2"></i> Cancelar
+                </button>
+                <button id="confirmButton" class="flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-check mr-2"></i> Confirmar
+                </button>
             </div>
         </div>
     </div>
