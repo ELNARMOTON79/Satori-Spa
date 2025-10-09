@@ -46,7 +46,7 @@
             <div class="flex justify-between items-center mb-8">
                 <div></div>
                 <div class="text-right">
-                    <span class="text-[#5C4633]">Bienvenido, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Administrador'; ?></span>
+                    
 
                     <a href="controllers/logout.php" class="ml-4 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#E9DCCB] focus:outline-none inline-block">
                         <svg class="inline h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
