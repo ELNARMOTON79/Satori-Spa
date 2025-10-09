@@ -23,13 +23,14 @@
             }
         }
 
-        private function cerrar_conexion()
+        public function cerrar_conexion() 
         {
-            if ($this->conexion) {
+            if ($this->conexion && gettype($this->conexion) === 'resource') {
                 pg_close($this->conexion);
                 $this->conexion = null;
             }
         }
+
 
         public function __destruct()
         {
