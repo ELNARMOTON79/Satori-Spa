@@ -42,17 +42,27 @@ foreach ($messages as $key => $message) {
 
 <div class="bg-white rounded-xl shadow p-6">
 
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-[#5C4633]">Gestión de Usuarios</h2>
-        <button onclick="openModal('userModal')" class="px-6 py-2 bg-[#5C4633] text-white rounded-lg hover:bg-[#4A3829] focus:outline-none flex items-center">
-            <i class="fa-solid fa-plus mr-2"></i>
-            Añadir Usuario
-        </button>
+    <div class="mb-6">
+        <div class="md:flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-[#5C4633]">Gestión de Usuarios</h2>
+            <button onclick="openModal('userModal')" class="px-6 py-2 bg-[#5C4633] text-white rounded-lg hover:bg-[#4A3829] focus:outline-none flex items-center">
+                <i class="fa-solid fa-plus mr-2"></i>
+                Añadir Usuario
+            </button>
+        </div>
+    
+        <div class="mt-4 relative"> <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+    </div>
+
+    <input type="text" id="userSearch" onkeyup="searchTable('userTable', this.value)" placeholder="Buscar por nombre..." class="pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 w-full md:w-auto">
+
+</div>
     </div>
 
     <!-- Tabla de usuarios -->
     <div class="overflow-x-auto">
-        <table class="w-full text-left">
+        <table id="userTable" class="w-full text-left">
             <thead class="bg-[#F5EBDD] text-[#5C4633]">
                 <tr>
                     <th class="p-3">Nombre</th>
@@ -348,4 +358,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+</script>
+<script>
+function searchTable(tableId, searchValue) {
+    let table = document.getElementById(tableId);
+    let tr = table.getElementsByTagName("tr");
+    searchValue = searchValue.toUpperCase();
+
+    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip thead
+        let td = tr[i].getElementsByTagName("td");
+        let rowVisible = false;
+
+        for (let j = 0; j < td.length; j++) {
+            if (td[j]) {
+                let textValue = td[j].textContent || td[j].innerText;
+                if (textValue.toUpperCase().indexOf(searchValue) > -1) {
+                    rowVisible = true;
+                    break; // If found in any column, show the row
+                }
+            }
+        }
+        if (rowVisible) {
+            tr[i].style.display = "";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}
+
+
+
 </script>
