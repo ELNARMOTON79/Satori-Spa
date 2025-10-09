@@ -60,17 +60,17 @@ if (isset($_GET['error'])) {
                             <td class="p-3"><?= htmlspecialchars($service['nombre_servicio']) ?></td>
                             <td class="p-3"><?= htmlspecialchars($service['descripcion']) ?></td>
                             <td class="p-3">$<?= htmlspecialchars(number_format($service['precio'], 2)) ?></td>
-                            <td class="p-3 flex gap-2">
-                                <button type="button" class="text-amber-700" title="Editar"
+                            <td class="p-3 flex gap-4 items-center">
+                                <button type="button" class="text-amber-700 hover:text-amber-900 transition-colors" title="Editar"
                                     onclick="openEditServiceModal(<?= htmlspecialchars(json_encode($service), ENT_QUOTES, 'UTF-8') ?>)">
-                                    <i class="fa-solid fa-pencil"></i>
+                                    <i class="fa-solid fa-pencil fa-lg"></i>
                                 </button>
                                 <form method="POST" action="controllers/service_controller.php" style="display:inline;" 
                                     onsubmit="event.preventDefault(); openConfirmationModal('¿Seguro que deseas eliminar este servicio?', () => this.submit());">
                                     <input type="hidden" name="deleteService" value="1">
                                     <input type="hidden" name="id" value="<?= $service['id'] ?>">
-                                    <button type="submit" class="text-red-600" title="Eliminar" style="background:none;border:none;padding:0;">
-                                        <i class="fa-solid fa-trash"></i>
+                                    <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Eliminar" style="background:none;border:none;padding:0;">
+                                        <i class="fa-solid fa-trash fa-lg"></i>
                                     </button>
                                 </form>
                             </td>
