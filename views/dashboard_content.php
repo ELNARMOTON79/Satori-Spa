@@ -5,7 +5,7 @@ $recentActivities = $controller->getRecentActivities();
 ?>
 <!-- Welcome Header -->
 <div class="mb-8">
-    <h1 class="text-3xl font-bold text-[#5C4633]">Satori SPA te da la Bienvenida, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Administrador'; ?></h1>
+    <h1 class="text-3xl font-bold text-[#5C4633]">Satori SPA te da la Bienvenida <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Administrador'; ?></h1>
     <p class="text-[#8C837B]">Aquí tienes un resumen de la actividad de tu spa.</p>
 </div>
 
