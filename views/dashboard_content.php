@@ -28,7 +28,7 @@ $recentActivities = $controller->getRecentActivities();
 </div>
 
 <!-- Actividad Reciente -->
-<div class="p-6 bg-white rounded-xl shadow">
+<div class="p-4 bg-white rounded-xl shadow">
  <h2 class="font-semibold text-lg text-[#5C4633] mb-4">Actividades Recientes</h2>
  <div style="max-height: 300px; overflow-y: auto;">
   <ul class="space-y-3">
