@@ -10,18 +10,18 @@ $recentActivities = $controller->getRecentActivities();
 </div>
 
 <div class="grid grid-cols-4 gap-6 mb-14 ml-32">
-    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] ">
-        <div class="text-[#8C837B] mb-2">Total de Usuarios</div>
+    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] flex flex-col items-center">
+        <div class="text-[#8C837B] mb-2"><i class="fa-regular fa-circle-user"></i> Total de Usuarios</div>
         <div id="totalUsuarios" class="text-3xl font-bold text-[#5C4633]"><?= $data['totalUsuarios'] ?></div>
         <div class="text-xs text-[#8C837B] mt-2">+12% desde el mes pasado</div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9]">
-        <div class="text-[#8C837B] mb-2">Total de Servicios</div>
+    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] flex flex-col items-center">
+        <div class="text-[#8C837B] mb-2"><i class="fa-solid fa-list mr-2"></i>Total de Servicios</div>
         <div id="serviciosActivos" class="text-3xl font-bold text-[#5C4633]"><?= $data['totalServicios'] ?></div>
         <div class="text-xs text-[#8C837B] mt-2">+2 nuevos servicios</div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9]">
-        <div class="text-[#8C837B] mb-2">Total de Citas</div>
+    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] flex flex-col items-center">
+        <div class="text-[#8C837B] mb-2"><i class="fa-regular fa-calendar-days mr-2"></i>Total de Citas</div>
         <div id="citasHoy" class="text-3xl font-bold text-[#5C4633]"><?= $data['totalCitas'] ?></div>
         <div class="text-xs text-[#8C837B] mt-2">4 pendientes</div>
     </div>
@@ -29,21 +29,23 @@ $recentActivities = $controller->getRecentActivities();
 
 <!-- Actividad Reciente -->
 <div class="p-6 bg-white rounded-xl shadow">
-    <h2 class="font-semibold text-lg text-[#5C4633] mb-4">Actividades Recientes</h2>
-    <ul class="space-y-3">
-        <?php foreach ($recentActivities as $activity): ?>
-            <?php
-                $dt = new DateTime($activity['fecha']);
-                $dt->setTimezone(new DateTimeZone('America/Mexico_City'));
-                $fecha_formateada = $dt->format('d/m/Y H:i');
-            ?>
-            <li class="border-b pb-2">
-                <span class="font-semibold text-[#5C4633] capitalize">
-                    <?= ucfirst($activity['tipo']); ?>:
-                </span>
-                <span class="text-[#5C4633]"><?= htmlspecialchars($activity['descripcion']); ?></span><br>
-                <span class="text-sm text-[#8C837B]"><?= $fecha_formateada; ?></span>
-            </li>
-        <?php endforeach; ?>
-    </ul>
+ <h2 class="font-semibold text-lg text-[#5C4633] mb-4">Actividades Recientes</h2>
+ <div style="max-height: 300px; overflow-y: auto;">
+  <ul class="space-y-3">
+   <?php foreach ($recentActivities as $activity): ?>
+   <?php
+    $dt = new DateTime($activity['fecha']);
+    $dt->setTimezone(new DateTimeZone('America/Mexico_City'));
+    $fecha_formateada = $dt->format('d/m/Y H:i');
+    ?>
+   <li class="border-b pb-2">
+    <span class="font-semibold text-[#5C4633] capitalize">
+     <?= ucfirst($activity['tipo']); ?>:
+    </span>
+    <span class="text-[#5C4633]"><?= htmlspecialchars($activity['descripcion']); ?></span><br>
+    <span class="text-sm text-[#8C837B]"><?= $fecha_formateada; ?></span>
+   </li>
+   <?php endforeach; ?>
+  </ul>
+ </div>
 </div>
