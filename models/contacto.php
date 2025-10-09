@@ -5,7 +5,7 @@ include_once __DIR__ . '/../config/database.php';
 class Contacto extends Conexion {
     public function login($correo, $contrasena) {
         // 1. Definir la consulta SQL para permitir solo el login de administradores (id_rol = 1)
-        $sql = "SELECT * FROM usuarios WHERE correo = $1 AND id_rol = 1";
+        $sql = "SELECT * FROM usuarios WHERE correo = $1 AND id_rol = 1 OR id_rol = 4";
 
         // 2. Obtener la conexión a la base de datos
         $conexion = $this->getConexion();
