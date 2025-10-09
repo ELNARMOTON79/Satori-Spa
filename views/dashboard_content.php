@@ -9,21 +9,21 @@ $recentActivities = $controller->getRecentActivities();
     <p class="text-[#8C837B]">Aquí tienes un resumen de la actividad de tu spa.</p>
 </div>
 
-<div class="grid grid-cols-4 gap-6 mb-14 ml-32">
-    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] flex flex-col items-center">
-        <div class="text-[#8C837B] mb-2"><i class="fa-regular fa-circle-user"></i> Total de Usuarios</div>
-        <div id="totalUsuarios" class="text-3xl font-bold text-[#5C4633]"><?= $data['totalUsuarios'] ?></div>
-        <div class="text-xs text-[#8C837B] mt-2">+12% desde el mes pasado</div>
+<div class="grid grid-cols-3 gap-2 mb-10 w-full">
+    <div class="bg-white rounded-xl shadow p-3 border border-[#EAE3D9] flex flex-col items-center justify-between h-28">
+        <div class="text-[#8C837B] text-xs text-center"><i class="fa-regular fa-circle-user"></i> Total de Usuarios</div>
+        <div id="totalUsuarios" class="text-xl font-bold text-[#5C4633]"><?= $data['totalUsuarios'] ?></div>
+        <div class="text-xs text-[#8C837B] text-center">+12% desde el mes pasado</div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] flex flex-col items-center">
-        <div class="text-[#8C837B] mb-2"><i class="fa-solid fa-list mr-2"></i>Total de Servicios</div>
-        <div id="serviciosActivos" class="text-3xl font-bold text-[#5C4633]"><?= $data['totalServicios'] ?></div>
-        <div class="text-xs text-[#8C837B] mt-2">+2 nuevos servicios</div>
+    <div class="bg-white rounded-xl shadow p-3 border border-[#EAE3D9] flex flex-col items-center justify-between h-28">
+        <div class="text-[#8C837B] text-xs text-center"><i class="fa-solid fa-list"></i> Total de Servicios</div>
+        <div id="serviciosActivos" class="text-xl font-bold text-[#5C4633]"><?= $data['totalServicios'] ?></div>
+        <div class="text-xs text-[#8C837B] text-center">+2 nuevos servicios</div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6 border border-[#EAE3D9] flex flex-col items-center">
-        <div class="text-[#8C837B] mb-2"><i class="fa-regular fa-calendar-days mr-2"></i>Total de Citas</div>
-        <div id="citasHoy" class="text-3xl font-bold text-[#5C4633]"><?= $data['totalCitas'] ?></div>
-        <div class="text-xs text-[#8C837B] mt-2">4 pendientes</div>
+    <div class="bg-white rounded-xl shadow p-3 border border-[#EAE3D9] flex flex-col items-center justify-between h-28">
+        <div class="text-[#8C837B] text-xs text-center"><i class="fa-regular fa-calendar-days"></i> Total de Citas</div>
+        <div id="citasHoy" class="text-xl font-bold text-[#5C4633]"><?= $data['totalCitas'] ?></div>
+        <div class="text-xs text-[#8C837B] text-center">4 pendientes</div>
     </div>
 </div>
 

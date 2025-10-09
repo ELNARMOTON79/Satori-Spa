@@ -9,7 +9,7 @@
 <body class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
     <div class="flex">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow h-screen flex flex-col">
+        <aside class="w-80 bg-white shadow h-screen flex flex-col">
             <div class="flex items-center px-6 py-4">
                 <img src="views/images/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
                 <div>
@@ -42,7 +42,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-10">
+        <main class="flex-1 p-4 overflow-x-hidden">
             <div class="flex justify-between items-center mb-8">
                 <div></div>
                 <div class="text-right">
