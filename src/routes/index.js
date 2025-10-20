@@ -4,7 +4,7 @@ const router = Router();
 const fetch = require('node-fetch');
 
 // IMPORTANT: Replace with your Firebase Web API Key
-const FIREBASE_API_KEY = 'AIzaSyAInkCQtGoouJ8Yn5eWQ70NnLXU-FvX-Jw';
+const FIREBASE_API_KEY = 'AIzaSyDZm61e0yhp49aYEtnsrxE9X9LiBcZJSas';
 
 router.get("/", (req, res) => {
   if (req.session.user) {
