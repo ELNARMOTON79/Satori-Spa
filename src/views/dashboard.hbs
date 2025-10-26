@@ -1,11 +1,63 @@
-<body class="bg-gray-100">
-    <div class="container mx-auto mt-10">
-        <div class="bg-white p-8 rounded-lg shadow-lg">
-            <h1 class="text-2xl font-bold mb-4">Bienvenido al Dashboard</h1>
-            <p class="mb-4">Hola admin, {{user.email}}</p>
-            <a href="/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Cerrar Sesión
-            </a>
-        </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SATORI SPA - Panel de Administración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />    
+</head>
+<body class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow flex flex-col">
+            <div class="flex items-center px-6 py-4">
+                <img src="/images/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
+                <div>
+                    <h1 class="font-bold text-lg text-[#5C4633]">SATORI SPA</h1>
+                    <span class="text-xs text-[#8C837B]">Panel de Administración</span>
+                </div>
+            </div>
+            <nav class="mt-8 flex-1">
+                <ul>
+                    <li>
+                        <a href="/dashboard" class="w-full flex items-center px-6 py-3 rounded-lg mb-2 focus:outline-none {{#if active.dashboard}}bg-[#80684B] text-white{{else}}text-[#5C4633] hover:bg-[#F5EBDD]{{/if}}">
+                            <i class="fa-solid fa-chart-simple mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/usuarios" class="w-full flex items-center px-6 py-3 rounded-lg mb-2 focus:outline-none {{#if active.usuarios}}bg-[#80684B] text-white{{else}}text-[#5C4633] hover:bg-[#F5EBDD]{{/if}}">
+                            <i class="fa-solid fa-users mr-2"></i>           
+                            Usuarios
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/servicios" class="w-full flex items-center px-6 py-3 rounded-lg focus:outline-none {{#if active.servicios}}bg-[#80684B] text-white{{else}}text-[#5C4633] hover:bg-[#F5EBDD]{{/if}}">
+                            <i class="fa-solid fa-list mr-2"></i>
+                            Servicios
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-10 flex flex-col">
+            <div class="sticky top-0 bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] z-10 py-4 flex justify-between items-center mb-8 shrink-0">
+                <div></div>
+                <div class="text-right">
+                    <a href="/logout" class="ml-4 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#E9DCCB] focus:outline-none inline-block">
+                        <svg class="inline h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex-grow overflow-y-auto">
+                {{{body}}}
+            </div>
+        </main>
+    
     </div>
 </body>
+</html>

@@ -1,0 +1,287 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{{#if query.created}}
+<div class="auto-hide-alert bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">¡Éxito!</strong>
+    <span class="block sm:inline">El servicio ha sido creado correctamente.</span>
+    <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';"><svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg></span>
+</div>
+{{/if}}
+{{#if query.updated}}
+<div class="auto-hide-alert bg-green-200 border border-green-500 text-green-800 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">¡Éxito!</strong>
+    <span class="block sm:inline">El servicio ha sido actualizado correctamente.</span>
+    <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';"><svg class="fill-current h-6 w-6 text-green-600" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg></span>
+</div>
+{{/if}}
+{{#if query.deleted}}
+<div class="auto-hide-alert bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">¡Éxito!</strong>
+    <span class="block sm:inline">El servicio ha sido eliminado correctamente.</span>
+    <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';"><svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg></span>
+</div>
+{{/if}}
+{{#if query.error}}
+<div class="auto-hide-alert bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+    <strong class="font-bold">¡Error!</strong>
+    <span class="block sm:inline">Ha ocurrido un error. Por favor, inténtelo de nuevo.</span>
+    <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';"><svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg></span>
+</div>
+{{/if}}
+
+<div class="flex flex-col h-full">
+    <!-- Header section (non-scrollable) -->
+    <div class="mb-6 md:flex justify-between items-center shrink-0">
+        <h2 class="text-2xl font-bold text-[#5C4633]">Gestión de Servicios</h2>
+        <div class="flex items-center gap-4 mt-4 md:mt-0">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="serviceSearch" 
+                    onkeyup="searchCards(this.value)" 
+                    placeholder="Buscar por nombre..." 
+                    class="pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-300 w-full md:w-auto"
+                >
+            </div>
+            <button onclick="openModal('serviceModal')" class="px-6 py-2 bg-[#5C4633] text-white rounded-lg hover:bg-[#4A3829] focus:outline-none flex items-center shrink-0">
+                <i class="fa-solid fa-plus mr-2"></i>
+                Añadir Servicio
+            </button>
+        </div>
+    </div>
+
+    <!-- Wrapper for scrolling -->
+    <div class="overflow-y-auto flex-grow">
+        <div id="service-cards-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {{#each services}}
+            <div class="service-card bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-transform duration-300 hover:scale-105">
+                <img src="{{#if imagen}}{{imagen}}{{else}}https://via.placeholder.com/400x300.png?text=Servicio+Sin+Imagen{{/if}}" alt="Imagen de {{this.servicio}}" class="w-full h-48 object-cover">
+                <div class="p-4 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold text-[#5C4633]">{{this.servicio}}</h3>
+                    <p class="text-sm text-gray-500 mb-2">{{this.categoria}}</p>
+                    <p class="text-gray-700 text-sm flex-grow">{{this.descripcion}}</p>
+                    <div class="mt-4">
+                        <p class="text-lg font-semibold text-[#5C4633]">${{this.precio}}</p>
+                        <p class="text-sm text-gray-600">Duración: {{this.duracion}} min</p>
+                        {{#ifEquals this.estado 'Activo'}}
+            <p class="text-sm font-medium text-blue-600">{{this.estado}}</p>
+        {{else}}
+            {{#ifEquals this.estado 'Disponible'}}
+                <p class="text-sm font-medium text-green-600">{{this.estado}}</p>
+            {{else}}
+                <p class="text-sm font-medium text-red-600">{{this.estado}}</p>
+            {{/ifEquals}}
+        {{/ifEquals}}
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 border-t flex justify-end gap-3">
+                    <button type="button" class="text-amber-700 hover:text-amber-900 transition-colors" title="Editar"
+                            onclick="openEditServiceModal('{{this.id}}', '{{this.servicio}}', '{{this.categoria}}', '{{this.descripcion}}', '{{this.precio}}', '{{this.estado}}', '{{this.duracion}}', '{{this.imagen}}')">
+                        <i class="fa-solid fa-pencil fa-lg"></i>
+                    </button>
+                    <form method="POST" action="/servicios/delete" style="display:inline;" 
+                          onsubmit="event.preventDefault(); openConfirmationModal('¿Seguro que deseas eliminar este servicio?', () => this.submit());">
+                        <input type="hidden" name="id" value="{{this.id}}">
+                        <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Eliminar" style="background:none;border:none;padding:0;">
+                            <i class="fa-solid fa-trash fa-lg"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {{else}}
+            <p class="text-center text-gray-500 col-span-full">No se encontraron servicios.</p>
+            {{/each}}
+        </div>
+    </div>
+
+<!-- Modal para añadir/editar servicio -->
+<div id="serviceModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-40">
+    <div class="relative mx-auto p-8 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+        <form action="/servicios/add" method="POST" class="space-y-4" enctype="multipart/form-data">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-[#5C4633]">Nuevo Servicio</h3>
+                <button type="button" onclick="closeModal('serviceModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times fa-lg"></i></button>
+            </div>
+            <div>
+                <label for="servicio" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Servicio</label>
+                <input type="text" id="servicio" name="servicio" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="categoria" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                <input type="text" id="categoria" name="categoria" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <textarea id="descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="100"></textarea>
+            </div>
+            <div>
+                <label for="precio" class="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                <input type="number" id="precio" name="precio" step="0.01" min="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="duracion" class="block text-sm font-medium text-gray-700 mb-1">Duración (minutos)</label>
+                <input type="number" id="duracion" name="duracion" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="imagenFile" class="block text-sm font-medium text-gray-700 mb-1">Subir Imagen</label>
+                <input type="file" id="imagenFile" name="imagenFile" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label for="estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                <select id="estado" name="estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <option value="activo">Activo</option>
+                    <option value="disponible">Disponible</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+            </div>
+            <div class="flex items-center justify-end gap-4 pt-4">
+                <button type="button" onclick="closeModal('serviceModal')" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg">Cancelar</button>
+                <button type="submit" class="px-6 py-2 bg-[#5C4633] text-white rounded-lg hover:bg-[#4A3829]">Guardar Servicio</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="editServiceModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
+    <div class="relative mx-auto p-8 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+        <form method="POST" action="/servicios/edit" class="space-y-4" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="edit_service_id">
+            <input type="hidden" name="currentImagen" id="current_imagen_hidden_input">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-[#5C4633]">Editar Servicio</h3>
+                <button type="button" onclick="closeModal('editServiceModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times fa-lg"></i></button>
+            </div>
+            <div>
+                <label for="edit_servicio" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Servicio</label>
+                <input type="text" id="edit_servicio" name="servicio" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="edit_categoria" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                <input type="text" id="edit_categoria" name="categoria" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="edit_descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <textarea id="edit_descripcion" name="descripcion" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required maxlength="100"></textarea>
+            </div>
+            <div>
+                <label for="edit_precio" class="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                <input type="number" id="edit_precio" name="precio" step="0.01" min="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div>
+                <label for="edit_duracion" class="block text-sm font-medium text-gray-700 mb-1">Duración (minutos)</label>
+                <input type="number" id="edit_duracion" name="duracion" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Imagen Actual</label>
+                <img id="current_image_preview" src="" alt="Imagen actual" class="w-32 h-32 object-cover rounded-lg border" style="display: none;">
+            </div>
+            <div>
+                <label for="edit_imagenFile" class="block text-sm font-medium text-gray-700 mb-1">Subir Nueva Imagen (Opcional)</label>
+                <input type="file" id="edit_imagenFile" name="imagenFile" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label for="edit_estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                <select id="edit_estado" name="estado" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <option value="activo">Activo</option>
+                    <option value="disponible">Disponible</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+            </div>
+            <div class="flex items-center justify-end gap-4 pt-4">
+                <button type="button" onclick="closeModal('editServiceModal')" class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg">Cancelar</button>
+                <button type="submit" class="px-6 py-2 bg-[#5C4633] text-white rounded-lg hover:bg-[#4A3829]">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-[60]">
+    <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white">
+        <div class="text-center p-5 flex-auto justify-center">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 fa-4x mx-auto mb-4"></i>
+            <h3 id="confirmationMessage" class="text-xl font-bold text-gray-800 mt-2"></h3>
+            <p class="text-sm text-gray-500 px-8">¿Estás seguro? Esta acción no se puede deshacer.</p>
+            <div class="mt-6 flex justify-center gap-4">
+                <button id="cancelButton" class="flex items-center px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <i class="fa-solid fa-times mr-2"></i> Cancelar
+                </button>
+                <button id="confirmButton" class="flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fa-solid fa-check mr-2"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+function openEditServiceModal(id, servicio, categoria, descripcion, precio, estado, duracion, imagen) {
+    document.getElementById('edit_service_id').value = id;
+    document.getElementById('edit_servicio').value = servicio;
+    document.getElementById('edit_categoria').value = categoria;
+    document.getElementById('edit_descripcion').value = descripcion;
+    document.getElementById('edit_precio').value = precio;
+    document.getElementById('edit_estado').value = estado;
+    document.getElementById('edit_duracion').value = duracion;
+
+    // Handle image preview
+    const imagePreview = document.getElementById('current_image_preview');
+    if (imagen) {
+        imagePreview.src = imagen;
+        imagePreview.style.display = 'block';
+    } else {
+        imagePreview.style.display = 'none';
+    }
+
+    // Set the hidden input for the current image URL
+    document.getElementById('current_imagen_hidden_input').value = imagen;
+
+    openModal('editServiceModal');
+}
+
+function openConfirmationModal(message, onConfirm) {
+    document.getElementById('confirmationMessage').textContent = message;
+    openModal('confirmationModal');
+    document.getElementById('confirmButton').onclick = function() {
+        onConfirm();
+        closeModal('confirmationModal');
+    };
+    document.getElementById('cancelButton').onclick = function() {
+        closeModal('confirmationModal');
+    };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.auto-hide-alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            alert.style.display = 'none';
+        }, 5000);
+    });
+});
+
+function searchCards(searchValue) {
+    const cards = document.querySelectorAll('.service-card');
+    const normalizedSearch = searchValue.toUpperCase();
+
+    cards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toUpperCase();
+        if (title.includes(normalizedSearch)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
