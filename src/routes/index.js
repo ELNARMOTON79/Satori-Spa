@@ -365,17 +365,23 @@ router.get("/usuarios", async (req, res) => {
     }
     try {
         const usersSnapshot = await db.collection('usuarios').orderBy('nombre').get();
-        const users = [];
+        const allUsers = [];
         usersSnapshot.forEach(doc => {
+            // Exclude Admins from the list
             if (doc.data().rol !== 'Admin') {
-                users.push({ id: doc.id, ...doc.data() });
+                allUsers.push({ id: doc.id, ...doc.data() });
             }
         });
+
+        // Exclude the currently logged-in user from the list
+        const loggedInUserId = req.session.user.uid;
+        const users = allUsers.filter(user => user.id !== loggedInUserId);
+
         res.render("user-view", { 
             active: { usuarios: true },
             user_name: req.session.user.nombre || req.session.user.email,
-            users: users, 
-            query: req.query 
+            users: users, // Pass the filtered list
+            query: req.query
         });
     } catch (error) {
         console.error("Error fetching users: ", error);
