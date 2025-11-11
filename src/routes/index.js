@@ -84,7 +84,7 @@ router.get("/dashboard", async (req, res) => { // Added async
 
   try {
     // --- Fetch Data from Firebase ---
-    const usersCollection = await db.collection('usuarios').get();
+    const usersCollection = await db.collection('usuarios').where('rol', '==', 'cliente').get();
     const servicesCollection = await db.collection('servicios').get();
     const appointmentsCollection = await db.collection('citas').get();
 
@@ -274,7 +274,7 @@ router.get("/servicios", async (req, res) => {
             services.push({ id: doc.id, ...doc.data() });
         });
         res.render("service-view", { 
-            active: { services: true },
+            active: { servicios: true },
             user_name: req.session.user.nombre || req.session.user.email,
             services: services, 
             query: req.query 
@@ -393,16 +393,17 @@ router.post("/usuarios/add", async (req, res) => {
     if (!req.session.user) {
         return res.redirect("/");
     }
-    const { nombre, apellido, correo, password, rol } = req.body;
+    const { nombre, apellido, correo, rol } = req.body;
 
     if (!['Secretario', 'Terapeuta'].includes(rol)) {
         return res.redirect(`/usuarios?error=${encodeURIComponent('No está permitido crear usuarios con el rol "' + rol + '"')}`);
     }
 
     try {
+        const tempPassword = uuidv4().substring(0, 8);
         const userRecord = await auth.createUser({
             email: correo,
-            password: password,
+            password: tempPassword,
             displayName: `${nombre} ${apellido}`
         });
 
@@ -427,7 +428,7 @@ router.post("/usuarios/edit", async (req, res) => {
     if (!req.session.user) {
         return res.redirect("/");
     }
-    const { id, nombre, apellido, correo, rol, password } = req.body;
+    const { id, nombre, apellido, correo, rol } = req.body;
 
     if (!['Secretario', 'Terapeuta'].includes(rol)) {
         return res.redirect(`/usuarios?error=${encodeURIComponent('No está permitido asignar el rol "' + rol + '"')}`);
@@ -448,9 +449,7 @@ router.post("/usuarios/edit", async (req, res) => {
             email: correo,
             displayName: `${nombre} ${apellido}`
         };
-        if (password) {
-            updatePayload.password = password;
-        }
+        
         await auth.updateUser(id, updatePayload);
 
         await auth.setCustomUserClaims(id, { role: rol });

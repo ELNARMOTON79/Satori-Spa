@@ -11,7 +11,9 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow flex flex-col">
             <div class="flex items-center px-6 py-4">
-                <img src="/images/logo.png" alt="Logotipo Satori Spa" class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 object-cover">
+                <div class="h-12 w-12 rounded-full bg-[#F5EBDD] mr-2 flex items-center justify-center overflow-hidden">
+                    <img src="/images/logo.png" alt="Logotipo Satori Spa" class="h-24 w-24 object-cover">
+                </div>
                 <div>
                     <h1 class="font-bold text-lg text-[#5C4633]">SATORI SPA</h1>
                     <span class="text-xs text-[#8C837B]">Panel de Administración</span>
@@ -42,7 +44,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-10 flex flex-col">
+        <main class="flex-1 p-10 flex flex-col overflow-hidden">
             <div class="sticky top-0 bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] z-10 py-4 flex justify-between items-center mb-8 shrink-0">
                 <div></div>
                 <div class="text-right">
@@ -53,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto">
+            <div class="flex-grow min-h-0">
                 {{{body}}}
             </div>
         </main>
