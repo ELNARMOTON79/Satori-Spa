@@ -182,13 +182,104 @@ router.get("/dashboard", async (req, res) => { // Added async
       };
     });
 
+    // --- Process Appointments for Chart and Tables ---
+    const appointmentsData = appointmentsCollection.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // --- DEBUGGING DASHBOARD ---
+    console.log('--- DEBUGGING DASHBOARD ---');
+    console.log(`Total de citas encontradas: ${appointmentsData.length}`);
+    if (appointmentsData.length > 0) {
+        console.log('Ejemplo de una cita:', JSON.stringify(appointmentsData[0], null, 2));
+    }
+    // --- END DEBUGGING ---
+
+    // --- Process Appointments for Chart (Current Week, Mon-Fri) ---
+    const todayForChart = new Date();
+    const dayOfWeek = todayForChart.getDay(); // Sunday: 0, Monday: 1, ..., Saturday: 6
+
+    // Adjust to make Monday the start of the week
+    const startOfWeek = new Date(todayForChart);
+    startOfWeek.setHours(0, 0, 0, 0); // Set time to midnight
+    const dayOffset = (dayOfWeek === 0) ? 6 : dayOfWeek - 1; // Mon: 0, ..., Sun: 6
+    startOfWeek.setDate(startOfWeek.getDate() - dayOffset);
+
+    // The end of the work week is the beginning of Saturday.
+    // The range will be [startOfWeek, endOfWeek)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 5); // Monday + 5 days = Saturday
+
+    // Initialize chart data for the work week
+    const chartLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const chartDataPoints = [0, 0, 0, 0, 0];
+
+    appointmentsData.forEach(cita => {
+        const appointmentDate = safeGetDate(cita.fecha);
+        // Check if the appointment is within the current work week [Mon, Sat) and not canceled
+        if (appointmentDate && appointmentDate >= startOfWeek && appointmentDate < endOfWeek && cita.estado !== 'Cancelada') {
+            const appointmentDayOfWeek = appointmentDate.getDay(); // Sunday: 0, Mon: 1, ..., Fri: 5
+            if (appointmentDayOfWeek >= 1 && appointmentDayOfWeek <= 5) { // Only process Mon-Fri
+                const chartIndex = appointmentDayOfWeek - 1; // Mon: 0, ..., Fri: 4
+                chartDataPoints[chartIndex]++;
+            }
+        }
+    });
+
+    const chartData = {
+        labels: chartLabels,
+        data: chartDataPoints
+    };
+
+    // --- DEBUGGING DASHBOARD ---
+    console.log('Datos finales para el gráfico (antes de stringify):', chartData);
+    console.log('--- FIN DEBUGGING ---');
+    // --- END DEBUGGING ---
+
+    // Tables Data: Get today's and canceled appointments
+    const today = new Date();
+
+    const citasDelDia = [];
+    const citasCanceladas = [];
+
+    appointmentsData.forEach(cita => {
+        // Ensure we are using the 'fecha' field from Firestore for the appointment date
+        const appointmentDate = safeGetDate(cita.fecha);
+
+        // Check for canceled appointments first, regardless of their date
+        if (cita.estado === 'Cancelada') {
+            citasCanceladas.push({
+                cliente: cita.nombreCliente,
+                servicio: cita.servicio,
+                // Use the 'fecha' field for the cancellation date display
+                fechaCancelacion: appointmentDate ? appointmentDate.toLocaleDateString('es-MX') : 'Fecha no disponible'
+            });
+        }
+        // Check for today's appointments that are not canceled
+        else if (appointmentDate) {
+            // Compare year, month, and day to reliably check if the appointment is for today
+            const isToday = appointmentDate.getFullYear() === today.getFullYear() &&
+                          appointmentDate.getMonth() === today.getMonth() &&
+                          appointmentDate.getDate() === today.getDate();
+
+            if (isToday) {
+                citasDelDia.push({
+                    cliente: cita.nombreCliente,
+                    servicio: cita.servicio,
+                    // Use the 'hora' field from Firebase directly, as requested
+                    hora: cita.hora || 'Hora no especificada'
+                });
+            }
+        }
+    });
+
     res.render("dashboard-content", {
       active: { dashboard: true },
       user_name: req.session.user.nombre || req.session.user.email,
       totalUsuarios,
       totalServicios,
       totalCitas,
-      recentActivities: formattedActivities
+      citasDelDia,
+      citasCanceladas,
+      chartData: JSON.stringify(chartData)
     });
 
   } catch (error) {
@@ -200,7 +291,9 @@ router.get("/dashboard", async (req, res) => { // Added async
       totalUsuarios: 0, // Provide default values
       totalServicios: 0,
       totalCitas: 0,
-      recentActivities: []
+      citasDelDia: [],
+      citasCanceladas: [],
+      chartData: JSON.stringify({ labels: [], data: [] })
     });
   }
 });
