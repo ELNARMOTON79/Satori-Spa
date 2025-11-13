@@ -110,18 +110,27 @@
                 <button type="button" onclick="closeModal('userModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times fa-lg"></i></button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div class="relative">
                     <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="top: 1.75rem;">
+                        <i class="fa-regular fa-circle-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="nombre" name="nombre" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
                 </div>
-                <div>
+                <div class="relative">
                     <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="top: 1.75rem;">
+                        <i class="fa-regular fa-circle-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="apellido" name="apellido" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
                 </div>
             </div>
-            <div>
+            <div class="relative">
                 <label for="correo" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                <input type="email" id="correo" name="correo" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="top: 1.75rem;">
+                    <i class="fa-regular fa-envelope text-gray-400"></i>
+                </div>
+                <input type="email" id="correo" name="correo" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" required>
             </div>
             <div>
                 <label for="rol" class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
@@ -149,18 +158,27 @@
                 <button type="button" onclick="closeModal('editUserModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times fa-lg"></i></button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div class="relative">
                     <label for="edit_nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                    <input type="text" id="edit_nombre" name="nombre" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="top: 1.75rem;">
+                        <i class="fa-regular fa-circle-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="edit_nombre" name="nombre" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
                 </div>
-                <div>
+                <div class="relative">
                     <label for="edit_apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                    <input type="text" id="edit_apellido" name="apellido" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="top: 1.75rem;">
+                        <i class="fa-regular fa-circle-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="edit_apellido" name="apellido" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" required onkeydown="filterStringInput(event)">
                 </div>
             </div>
-            <div>
+            <div class="relative">
                 <label for="edit_correo" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                <input type="email" id="edit_correo" name="correo" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" style="top: 1.75rem;">
+                    <i class="fa-regular fa-envelope text-gray-400"></i>
+                </div>
+                <input type="email" id="edit_correo" name="correo" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" required>
             </div>
             <div>
                 <label for="edit_rol" class="block text-sm font-medium text-gray-700 mb-1">Rol</label>

@@ -4,6 +4,48 @@ const router = Router();
 const fetch = require('node-fetch');
 const multer = require('multer'); // Added multer
 const { v4: uuidv4 } = require('uuid'); // For unique filenames
+const nodemailer = require('nodemailer');
+
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_PORT == 465, // true for 465, false for other ports
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
+// Function to send verification email
+async function sendVerificationEmail(email, name, tempPassword, verificationLink) {
+    const mailOptions = {
+        from: `"Satori Spa" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Bienvenido a Satori Spa - Verifique su cuenta',
+        html: `
+            <h1>Bienvenido a Satori Spa, ${name}</h1>
+            <p>Su cuenta ha sido creada exitosamente.</p>
+            <p>Utilice la siguiente contraseña temporal para iniciar sesión:</p>
+            <h2>${tempPassword}</h2>
+            <p>Por favor, verifique su dirección de correo electrónico haciendo clic en el siguiente enlace:</p>
+            <a href="${verificationLink}" target="_blank">Verificar mi correo electrónico</a>
+            <p>Una vez que inicie sesión, le recomendamos cambiar su contraseña.</p>
+            <br>
+            <p>Gracias,</p>
+            <p>El equipo de Satori Spa</p>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Verification email sent to:', email);
+    } catch (error) {
+        console.error('Error sending verification email:', error);
+        // We don't re-throw the error, just log it. The user was already created.
+    }
+}
+
 
 // IMPORTANT: Replace with your Firebase Web API Key
 const FIREBASE_API_KEY = 'AIzaSyDZm61e0yhp49aYEtnsrxE9X9LiBcZJSas';
@@ -259,7 +301,12 @@ router.get("/logout", (req, res) => {
 router.get('/dashboard_secretario', (req, res) => {
   if (!req.session.user) return res.redirect('/');
   if (req.session.user.role !== 'secretario') return res.redirect('/dashboard');
-  res.render('dashboard_secretario', { user: req.session.user });
+  res.render('dashboard_secretario-content', {
+    layout: 'dashboard', // Use the main dashboard layout
+    active: { dashboard: true }, // Set the active link
+    user: req.session.user,
+    user_name: req.session.user.nombre || req.session.user.email
+  });
 });
 
 // --- Service Management Routes ---
@@ -417,10 +464,33 @@ router.post("/usuarios/add", async (req, res) => {
             createdAt: new Date()
         });
 
+        // Generate email verification link
+        const continueUrl = `${req.protocol}://${req.get('host')}/`; // Redirect to home page after verification
+        const verificationLink = await auth.generateEmailVerificationLink(correo, { url: continueUrl });
+
+        // Send the verification email
+        await sendVerificationEmail(correo, nombre, tempPassword, verificationLink);
+
         res.redirect("/usuarios?created=true");
     } catch (error) {
         console.error("Error adding user: ", error);
-        res.redirect(`/usuarios?error=${encodeURIComponent(error.message)}`);
+        let errorMessage = error.message;
+        if (error.code === 'auth/email-already-exists') {
+            errorMessage = 'El correo electrónico ya está registrado. Por favor, utilice otro.';
+        }
+        
+        // If a userRecord was created before a subsequent error, delete the auth user
+        // to prevent orphaned auth accounts.
+        if (typeof userRecord !== 'undefined' && userRecord.uid) {
+            try {
+                await auth.deleteUser(userRecord.uid);
+                console.log(`Cleaned up orphaned user: ${userRecord.uid}`);
+            } catch (cleanupError) {
+                console.error(`Failed to clean up orphaned user ${userRecord.uid}:`, cleanupError);
+            }
+        }
+        
+        res.redirect(`/usuarios?error=${encodeURIComponent(errorMessage)}`);
     }
 });
 
