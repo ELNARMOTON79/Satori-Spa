@@ -1,0 +1,911 @@
+<div class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
+    <div class="flex h-screen">
+        {{> secretaria_sidebar sections=sections active=active user=user}}
+        <main class="flex-1 p-6 flex flex-col min-h-0 overflow-hidden text-[#5A3E2A]">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold flex items-center gap-3">
+                        <i class="fa-solid fa-calendar-days text-[#6B4F2B] text-2xl" aria-hidden="true"></i>
+                        Citas agendadas
+                    </h1>
+                    <p class="text-sm text-[#5A3E2A]/70 mt-1">Lista de citas próximas y su estado.</p>
+                </div>
+                <button id="btnNewCita" type="button"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#efe3cc] focus:outline-none focus:ring-2 focus:ring-[#E0D5C5]">
+                    <i class="fa-solid fa-plus h-5 w-5 text-[#6B4F2B]" aria-hidden="true"></i>
+                    <span class="font-medium text-sm text-[#6B4F2B]">Nueva cita</span>
+                </button>
+            </div>
+
+            <!-- Controls: search + filter -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 w-full md:w-1/2">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/50"
+                            aria-hidden="true"></i>
+                        <input id="searchInput" type="text" placeholder="Buscar por cliente, servicio o teléfono"
+                            aria-label="Buscar citas por cliente, servicio o teléfono"
+                            class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 pr-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A] placeholder-[#5A3E2A]/40" />
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="text-sm font-medium text-[#5A3E2A] inline-flex items-center">
+                        <i class="fa-solid fa-filter mr-2 text-[#5A3E2A]" aria-hidden="true"></i>
+                        Filtrar por estado:
+                    </label>
+                    <select id="filterEstado"
+                        class="appearance-none rounded-md border-[#E0D5C5] bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]">
+                        <option value="">Todos los estados</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Confirmada">Confirmada</option>
+                        <option value="Cancelada">Cancelada</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table section -->
+            <section aria-labelledby="citasHeading" class="mb-8 overflow-auto flex-1">
+                <h2 id="citasHeading" class="sr-only">Listado de citas</h2>
+
+                <div class="bg-white p-4 rounded shadow border border-[#E0D5C5]">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full leading-normal divide-y divide-[#E0D5C5]">
+                            <thead>
+                                <tr class="text-left">
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-calendar-days mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Fecha</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-clock mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Hora</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-user mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Cliente</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-spa mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Servicio</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-phone mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Teléfono</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-tag mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Estado</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-ellipsis-h mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Acciones</th>
+                                    <th class="px-6 py-3 text-sm font-medium text-[#5A3E2A] border-b border-[#E0D5C5]">
+                                        <i class="fa-solid fa-user-tie mr-2 text-[#6B4F2B]" aria-hidden="true"></i> Terapeuta</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-[#E0D5C5]">
+                                {{#if appointments}}
+                                {{#each appointments}}
+                                <tr class="hover:bg-[#F5EBDD]/30">
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5] text-sm text-[#5A3E2A]">{{this.date}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5] text-sm text-[#5A3E2A]">{{this.time}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5] font-semibold text-[#5A3E2A]">{{this.clientName}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5] text-sm text-[#5A3E2A]">{{this.service}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5] text-sm text-[#5A3E2A]">{{this.phone}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5]">
+                                        <select
+                                            class="status-select inline-flex items-center px-3 py-1 rounded-md text-sm font-medium border border-[#E0D5C5] focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]"
+                                            data-status="{{this.status}}" data-id="{{this.id}}">
+                                            <option style="color: white;" value="Pendiente">Pendiente</option>
+                                            <option style="color: white;" value="Confirmada">Confirmada</option>
+                                            <option style="color: white;" value="Cancelada">Cancelada</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5]">
+                                        <button type="button"
+                                            class="btn-edit inline-flex items-center gap-2 px-3 py-1.5 bg-[#F5EBDD] text-[#6B4F2B] rounded-lg border border-[#E0D5C5] hover:bg-[#efe3cc] focus:outline-none focus:ring-2 focus:ring-[#E0D5C5]"
+                                            aria-label="Editar cita">
+                                            <i class="fa-solid fa-pen w-4 h-4" aria-hidden="true"></i>
+                                            <span class="text-sm font-medium">Editar</span>
+                                        </button>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b border-[#E0D5C5] text-sm text-[#5A3E2A]">{{this.therapist}}</td>
+                                </tr>
+                                {{/each}}
+                                <tr id="noResultsRow" class="hidden">
+                                    <td class="px-6 py-8 text-center text-[#5A3E2A]/70" colspan="8">No hay citas que coincidan con el filtro.</td>
+                                </tr>
+                                {{else}}
+                                <tr>
+                                    <td class="px-6 py-8 text-center text-[#5A3E2A]/70" colspan="8">No hay citas para
+                                        mostrar.</td>
+                                </tr>
+                                {{/if}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal: Crear cita -->
+        <div id="modalCita" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50"
+            aria-hidden="true" role="dialog" aria-modal="true">
+            <div
+                class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 overflow-visible max-h-[90vh] overflow-auto border border-[#E0D5C5]">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-[#E0D5C5]">
+                    <h3 id="modalTitle" class="text-lg font-semibold text-[#5A3E2A]">Crear nueva cita</h3>
+                    <button id="btnCloseModal" class="text-[#5A3E2A] hover:text-[#6B4F2B]">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="formCita" class="p-6 space-y-4">
+                    <input type="hidden" id="appointmentId" name="appointmentId" />
+                    <div>
+                        <label class="block text-sm font-medium text-[#5A3E2A] mb-1">Servicio</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-spa absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/60" aria-hidden="true"></i>
+                            <select id="selectServicios" name="serviceId" required
+                                class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]">
+                                <option value="">Cargando servicios...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-[#5A3E2A] mb-1">Fecha</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/60" aria-hidden="true"></i>
+                                <input required name="fecha" type="date"
+                                    class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-[#5A3E2A] mb-1">Hora</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-clock absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/60" aria-hidden="true"></i>
+                                <select required name="hora" id="selectHora"
+                                    class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]">
+                                    <option value="">Selecciona hora</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 py-2">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="clientType" value="registered" id="clientTypeRegistered" checked
+                                class="text-[#6B4F2B] focus:ring-[#6B4F2B]" />
+                            <span class="text-sm text-[#5A3E2A]">Cliente registrado</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="clientType" value="guest" id="clientTypeGuest"
+                                class="text-[#6B4F2B] focus:ring-[#6B4F2B]" />
+                            <span class="text-sm text-[#5A3E2A]">Cliente sin cuenta</span>
+                        </label>
+                    </div>
+
+                    <div id="registeredBlock">
+                        <label class="block text-sm font-medium text-[#5A3E2A] mb-1">Seleccionar cliente</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/60" aria-hidden="true"></i>
+                            <select id="selectClientes" name="clienteId"
+                                class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]">
+                                <option value="">Cargando clientes...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="guestBlock" class="hidden">
+                        <label class="block text-sm font-medium text-[#5A3E2A] mb-1">Nombre del cliente (sin
+                            cuenta)</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/60" aria-hidden="true"></i>
+                            <input id="inputGuestName" name="clienteName" type="text" maxlength="60" placeholder="Nombre completo (solo letras)"
+                                class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A] placeholder-[#5A3E2A]/40" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-[#5A3E2A] mb-1">Teléfono (opcional)</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-[#5A3E2A]/60" aria-hidden="true"></i>
+                                <input id="inputPhone" name="telefono" type="tel" maxlength="10" inputmode="numeric" pattern="\d*" placeholder="3122345678" 
+                                    class="block w-full rounded-md border-[#E0D5C5] shadow-sm pl-10 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E0D5C5] mt-4">
+                        <button type="button" id="btnCancel"
+                            class="px-4 py-2 rounded bg-white border border-[#E0D5C5] text-[#5A3E2A] hover:bg-[#F5EBDD]/30">
+                            <i class="fa-solid fa-xmark w-4 h-4 mr-2" aria-hidden="true"></i>
+                            <span>Cancelar</span>
+                        </button>
+                        <button type="submit" id="btnSubmitCita"
+                            class="inline-flex items-center gap-2 bg-[#6B4F2B] text-white px-4 py-2 rounded hover:bg-[#5a3f23]">
+                            <i class="fa-solid fa-check w-4 h-4" aria-hidden="true"></i>
+                            <span id="submitTextCita">Crear cita</span>
+                        </button>
+                    </div>
+                    <!-- Styled confirmation (hidden until needed) - same design as usuarios modalConfirm -->
+                    <div id="modalConfirmCita" class="hidden mb-4 p-4 rounded border border-gray-200 bg-gray-50">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <p id="modalConfirmCitaText" class="text-sm text-gray-800">¿Confirmar creación de esta cita?</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="cancelCitaConfirmBtn" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Cancelar</button>
+                                <button type="button" id="confirmCitaBtn" class="px-3 py-1 rounded bg-[#6B4F2B] text-white hover:bg-[#5a3f23]">Confirmar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="formMessage" class="text-sm mt-2"></div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                const btnOpen = document.getElementById('btnNewCita');
+                const modal = document.getElementById('modalCita');
+                const btnClose = document.getElementById('btnCloseModal');
+                const btnCancel = document.getElementById('btnCancel');
+                const form = document.getElementById('formCita');
+                const modalTitle = document.getElementById('modalTitle');
+                const appointmentIdEl = document.getElementById('appointmentId');
+                const selectClientes = document.getElementById('selectClientes');
+                const selectServicios = document.getElementById('selectServicios');
+                const selectHora = document.getElementById('selectHora');
+                const inputPhoneEl = document.getElementById('inputPhone');
+                const inputGuestNameEl = document.getElementById('inputGuestName');
+                const btnSubmitCita = document.getElementById('btnSubmitCita');
+                const modalConfirm = document.getElementById('modalConfirmCita');
+                const modalConfirmText = document.getElementById('modalConfirmCitaText');
+                const confirmCitaBtn = document.getElementById('confirmCitaBtn');
+                const cancelCitaConfirmBtn = document.getElementById('cancelCitaConfirmBtn');
+                // Phone input: allow only digits and limit to 10 characters
+                if (inputPhoneEl) {
+                    inputPhoneEl.setAttribute('maxlength', '10');
+                    inputPhoneEl.setAttribute('inputmode', 'numeric');
+                    // on input: strip non-digits and limit length
+                    inputPhoneEl.addEventListener('input', function () {
+                        try {
+                            const only = (this.value || '').toString().replace(/\D+/g, '').slice(0, 10);
+                            if (this.value !== only) this.value = only;
+                        } catch (e) { /* ignore */ }
+                    });
+                    // on paste: sanitize pasted text
+                    inputPhoneEl.addEventListener('paste', function (ev) {
+                        try {
+                            ev.preventDefault();
+                            const text = (ev.clipboardData || window.clipboardData).getData('text') || '';
+                            const only = text.replace(/\D+/g, '').slice(0, 10);
+                            // insert sanitized text at cursor position
+                            const start = this.selectionStart || 0;
+                            const end = this.selectionEnd || 0;
+                            const newVal = (this.value || '').slice(0, start) + only + (this.value || '').slice(end);
+                            this.value = newVal.slice(0, 10);
+                        } catch (e) { /* ignore */ }
+                    });
+                }
+                // Guest name: allow only letters (unicode) and spaces; remove numbers/special chars
+                if (inputGuestNameEl) {
+                    inputGuestNameEl.setAttribute('maxlength', '60');
+                    inputGuestNameEl.addEventListener('input', function () {
+                        try {
+                            // keep letters and spaces only (unicode letters supported)
+                            const cleaned = (this.value || '').toString().replace(/[^\p{L}\s]/gu, '').replace(/\s{2,}/g, ' ');
+                            if (this.value !== cleaned) this.value = cleaned;
+                        } catch (e) { /* ignore */ }
+                    });
+                    inputGuestNameEl.addEventListener('paste', function (ev) {
+                        try {
+                            ev.preventDefault();
+                            const text = (ev.clipboardData || window.clipboardData).getData('text') || '';
+                            const only = text.toString().replace(/[^\p{L}\s]/gu, '').replace(/\s{2,}/g, ' ').slice(0, 60);
+                            const start = this.selectionStart || 0;
+                            const end = this.selectionEnd || 0;
+                            const newVal = (this.value || '').slice(0, start) + only + (this.value || '').slice(end);
+                            this.value = newVal.slice(0, 60);
+                        } catch (e) { /* ignore */ }
+                    });
+                }
+                let clientesCache = [];
+                const registeredBlock = document.getElementById('registeredBlock');
+                const guestBlock = document.getElementById('guestBlock');
+                const clientTypeRegistered = document.getElementById('clientTypeRegistered');
+                const clientTypeGuest = document.getElementById('clientTypeGuest');
+                const formMessage = document.getElementById('formMessage');
+
+                async function openModal() {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setMinDate();
+                    await loadOptions();
+                }
+                function closeModal() {
+                    modal.classList.remove('flex');
+                    modal.classList.add('hidden');
+                    form.reset();
+                    formMessage.textContent = '';
+                    // reset blocks
+                    registeredBlock.classList.remove('hidden');
+                    guestBlock.classList.add('hidden');
+                    appointmentIdEl.value = '';
+                    modalTitle.textContent = 'Crear nueva cita';
+                    try {
+                        const submitText = document.getElementById('submitTextCita');
+                        if (submitText) submitText.textContent = 'Crear cita';
+                    } catch (e) { /* ignore */ }
+                }
+
+                btnOpen && btnOpen.addEventListener('click', openModal);
+                btnClose && btnClose.addEventListener('click', closeModal);
+                btnCancel && btnCancel.addEventListener('click', closeModal);
+
+                // Toggle client type
+                function updateClientType() {
+                    if (clientTypeGuest && clientTypeGuest.checked) {
+                        registeredBlock.classList.add('hidden');
+                        guestBlock.classList.remove('hidden');
+                    } else {
+                        registeredBlock.classList.remove('hidden');
+                        guestBlock.classList.add('hidden');
+                    }
+                }
+                clientTypeRegistered && clientTypeRegistered.addEventListener('change', updateClientType);
+                clientTypeGuest && clientTypeGuest.addEventListener('change', updateClientType);
+
+                async function loadOptions() {
+                    // load clientes
+                    try {
+                        selectClientes.innerHTML = '<option value="">Cargando clientes...</option>';
+                        const resp = await fetch('/api/clientes');
+                        const data = await resp.json();
+                        if (data && data.ok && Array.isArray(data.clientes)) {
+                            clientesCache = data.clientes;
+                            selectClientes.innerHTML = '<option value="">-- Selecciona un cliente --</option>' + data.clientes.map(c => `<option value="${c.id}" data-phone="${(c.phone || c.telefono || '')}">${(c.name || c.nombre || c.email || '')}</option>`).join('');
+                        } else {
+                            selectClientes.innerHTML = '<option value="">No hay clientes</option>';
+                        }
+                    } catch (e) {
+                        selectClientes.innerHTML = '<option value="">Error cargando clientes</option>';
+                    }
+
+                    // load servicios
+                    try {
+                        selectServicios.innerHTML = '<option value="">Cargando servicios...</option>';
+                        const resp2 = await fetch('/api/servicios/activos');
+                        const data2 = await resp2.json();
+                        const servicios = (data2 && data2.ok && Array.isArray(data2.servicios)) ? data2.servicios : (data2 && data2.servicios) || [];
+                        if (servicios.length) {
+                            selectServicios.innerHTML = '<option value="">-- Selecciona un servicio --</option>' + servicios.map(s => `<option value="${s.id}">${(s.servicio || s.nombre || s.serviceName || s.servicio_nombre || s.id)}</option>`).join('');
+                        } else {
+                            // fallback to /api/servicios
+                            const resp3 = await fetch('/api/servicios');
+                            const data3 = await resp3.json();
+                            const list = (data3 && data3.ok && Array.isArray(data3.servicios)) ? data3.servicios : [];
+                            if (list.length) selectServicios.innerHTML = '<option value="">-- Selecciona un servicio --</option>' + list.map(s => `<option value="${s.id}">${(s.servicio || s.nombre || s.id)}</option>`).join('');
+                            else selectServicios.innerHTML = '<option value="">No hay servicios</option>';
+                        }
+                    } catch (e) {
+                        selectServicios.innerHTML = '<option value="">Error cargando servicios</option>';
+                    }
+
+                    // reset hora select when modal opens
+                    populateHourOptions();
+                    return {clientes: clientesCache};
+                }
+
+                // Populate hour options (09:00 - 19:00) and optionally filter by booked slots
+                function populateHourOptions(availableHours) {
+                    // availableHours: Set of strings like '10:00' that are allowed; if omitted, show all
+                    const start = 9; const end = 19; // inclusive
+                    const opts = ['<option value="">Selecciona hora</option>'];
+                    for (let h = start; h <= end; h++) {
+                        const hh = String(h).padStart(2, '0') + ':00';
+                        if (availableHours && !availableHours.has(hh)) continue; // skip unavailable
+                        opts.push(`<option value="${hh}">${hh}</option>`);
+                    }
+                    if (selectHora) selectHora.innerHTML = opts.join('');
+                }
+
+                // When date or service changes, recompute available hours
+                async function updateAvailableHours() {
+                    if (!selectServicios || !selectHora) return;
+                    const sid = selectServicios.value;
+                    const fecha = (document.querySelector('[name="fecha"]') || {}).value;
+                    // if fecha is a weekend, show not-available message
+                    try {
+                        if (fecha) {
+                            const d = new Date(fecha + 'T00:00:00');
+                            const day = isNaN(d.getDay()) ? null : d.getDay();
+                            if (day === 0 || day === 6) {
+                                if (selectHora) selectHora.innerHTML = '<option value="">Fecha no disponible (fin de semana)</option>';
+                                return;
+                            }
+                        }
+                    } catch (e) { }
+                    if (!sid || !fecha) {
+                        // show full list but disabled instructive option
+                        selectHora.innerHTML = '<option value="">Selecciona fecha y servicio</option>';
+                        return;
+                    }
+
+                    try {
+                        const resp = await fetch('/api/citas');
+                        const j = await resp.json();
+                        const appointments = (j && j.ok && Array.isArray(j.appointments)) ? j.appointments : (j && j.appointments) || [];
+                        // compute booked times for the chosen date & service id
+                        const booked = new Set();
+                        appointments.forEach(a => {
+                            try {
+                                const raw = a.raw || {};
+                                const rawSvc = raw.servicio || raw.service || raw.servicio_id || raw.service_id || null;
+                                // compare service id or fallback to label
+                                if (String(rawSvc) !== String(sid)) return;
+                                if (String(a.date) !== String(fecha)) return;
+                                if (a.time) booked.add(String(a.time));
+                            } catch (e) { }
+                        });
+
+                        // build allowed hours by excluding booked
+                        const allowed = new Set();
+                        for (let h = 9; h <= 19; h++) { const hh = String(h).padStart(2, '0') + ':00'; if (!booked.has(hh)) allowed.add(hh); }
+                        populateHourOptions(allowed);
+                    } catch (e) {
+                        // on error, show all hours
+                        populateHourOptions();
+                    }
+                }
+
+                // helper: detect weekend and next non-weekend date
+                function _isWeekend(dateStr) {
+                    try {
+                        if (!dateStr) return false;
+                        const d = new Date(dateStr + 'T00:00:00');
+                        const day = d.getDay();
+                        return (day === 0 || day === 6);
+                    } catch (e) { return false; }
+                }
+                function _nextNonWeekendDate(fromDate) {
+                    const d = new Date(fromDate.getTime());
+                    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+                    return d;
+                }
+
+                // set today's date as minimum selectable date for the fecha input (skip weekends)
+                function setMinDate(){
+                    try{
+                        const dateInput = document.querySelector('[name="fecha"]');
+                        if (!dateInput) return;
+                        const now = new Date();
+                        // if today is weekend, advance to next Monday (or next non-weekend)
+                        const valid = _nextNonWeekendDate(now);
+                        const yyyy = valid.getFullYear();
+                        const mm = String(valid.getMonth() + 1).padStart(2, '0');
+                        const dd = String(valid.getDate()).padStart(2, '0');
+                        const minStr = `${yyyy}-${mm}-${dd}`;
+                        dateInput.min = minStr;
+                        // if the currently selected value is before min or is a weekend, clear it
+                        if (dateInput.value && (dateInput.value < minStr || _isWeekend(dateInput.value))) dateInput.value = '';
+                    }catch(e){ /* ignore */ }
+                }
+
+                // validate date isn't weekend; returns true if valid
+                function validateDateNotWeekend() {
+                    try {
+                        const dateInput = document.querySelector('[name="fecha"]');
+                        if (!dateInput) return true;
+                        const val = dateInput.value;
+                        if (!val) { formMessage.textContent = ''; return true; }
+                        if (_isWeekend(val)) {
+                            formMessage.className = 'text-sm text-red-600';
+                            formMessage.textContent = 'No se permiten sábados ni domingos. Selecciona otra fecha.';
+                            dateInput.value = '';
+                            if (selectHora) selectHora.innerHTML = '<option value="">Selecciona fecha entre lunes y viernes</option>';
+                            return false;
+                        }
+                        // valid date
+                        formMessage.textContent = '';
+                        return true;
+                    } catch (e) { return true; }
+                }
+
+                // wire change events
+                if (selectServicios) selectServicios.addEventListener('change', updateAvailableHours);
+                const inputFecha = document.querySelector('[name="fecha"]');
+                if (inputFecha) {
+                    inputFecha.addEventListener('change', function () { if (validateDateNotWeekend()) updateAvailableHours(); });
+                    inputFecha.addEventListener('input', validateDateNotWeekend);
+                }
+
+                // when a registered client is selected, populate phone input with their number
+                if (selectClientes) {
+                    selectClientes.addEventListener('change', function () {
+                        try {
+                            const id = this.value;
+                            const opt = this.options[this.selectedIndex];
+                            const phone = opt && opt.dataset ? opt.dataset.phone : null;
+                            if (!id) { if (inputPhoneEl) inputPhoneEl.value = ''; return; }
+                            if (inputPhoneEl) inputPhoneEl.value = phone || '';
+                        } catch (e) { console.debug && console.debug(e); }
+                    });
+                }
+
+                // when switching to guest, clear phone if desired
+                if (clientTypeGuest) clientTypeGuest.addEventListener('change', function () { if (this.checked && inputPhoneEl) inputPhoneEl.value = ''; });
+
+                form && form.addEventListener('submit', async function (ev) {
+                    ev.preventDefault();
+                    formMessage.textContent = '';
+                    const formData = new FormData(form);
+                    // validate fecha is not in the past
+                    const selectedDate = formData.get('fecha');
+                    const dateInput = document.querySelector('[name="fecha"]');
+                    if (!selectedDate) { formMessage.className = 'text-sm text-red-600'; formMessage.textContent = 'Selecciona una fecha.'; return; }
+                    if (dateInput && dateInput.min) {
+                        if (selectedDate < dateInput.min) { formMessage.className = 'text-sm text-red-600'; formMessage.textContent = 'No puedes seleccionar una fecha pasada.'; return; }
+                    }
+                    // block weekends on submit
+                    try {
+                        const dchk = new Date(selectedDate + 'T00:00:00');
+                        const daychk = dchk.getDay();
+                        if (daychk === 0 || daychk === 6) { formMessage.className = 'text-sm text-red-600'; formMessage.textContent = 'No se permiten sábados ni domingos.'; return; }
+                    } catch (e) { }
+                    const clientType = formData.get('clientType');
+                    const payload = {};
+                    payload.date = formData.get('fecha');
+                    payload.time = formData.get('hora');
+                    // sanitize telefono: only digits, max 10
+                    const rawPhone = formData.get('telefono') || '';
+                    const cleanPhone = (rawPhone || '').toString().replace(/\D+/g, '').slice(0, 10) || null;
+                    payload.telefono = cleanPhone;
+                    payload.status = 'Pendiente';
+
+                    if (clientType === 'registered') {
+                        const cid = formData.get('clienteId');
+                        if (!cid) { formMessage.textContent = 'Selecciona un cliente registrado.'; return; }
+                        payload.clienteId = cid;
+                    } else {
+                        const guest = formData.get('clienteName') || '';
+                        // sanitize guest name: only unicode letters and spaces, collapse spaces, max 60
+                        let cleanGuest = (guest || '').toString().replace(/[^\p{L}\s]/gu, '').replace(/\s{2,}/g, ' ').slice(0, 60).trim();
+                        // fallback if sanitization removed everything
+                        if (!cleanGuest) { formMessage.textContent = 'Ingresa el nombre del cliente (solo letras).'; return; }
+                        payload.clienteName = cleanGuest;
+                    }
+
+                    const sid = formData.get('serviceId');
+                    if (!sid) { formMessage.textContent = 'Selecciona un servicio.'; return; }
+                    payload.serviceId = sid;
+
+                    // confirm action with a styled modal (like the usuarios modal)
+                    const editingId = (appointmentIdEl && appointmentIdEl.value) ? String(appointmentIdEl.value) : null;
+                    const confirmMsg = editingId ? '¿Seguro que desea editar la cita?' : '¿Seguro que desea crear la cita?';
+
+                    // helper to perform the actual network request
+                    async function performRequest() {
+                        try {
+                            let r, j;
+                            if (editingId) {
+                                r = await fetch(`/api/citas/${editingId}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(payload)
+                                });
+                                j = await r.json();
+                            } else {
+                                r = await fetch('/api/citas', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(payload)
+                                });
+                                j = await r.json();
+                            }
+                            if (r.ok && j && j.ok) {
+                                formMessage.className = 'text-sm text-green-600';
+                                formMessage.textContent = editingId ? 'Cita actualizada correctamente.' : 'Cita creada correctamente.';
+                                setTimeout(() => { closeModal(); location.reload(); }, 800);
+                            } else {
+                                formMessage.className = 'text-sm text-red-600';
+                                formMessage.textContent = (j && j.error) ? j.error : (editingId ? 'Error al actualizar cita.' : 'Error al crear cita.');
+                            }
+                        } catch (e) {
+                            formMessage.className = 'text-sm text-red-600';
+                            formMessage.textContent = 'Error de red al crear/actualizar cita.';
+                        }
+                    }
+
+                    // If our styled confirm area exists, show it and wire handlers
+                    if (modalConfirm && modalConfirmText && confirmCitaBtn) {
+                        modalConfirmText.textContent = confirmMsg;
+                        modalConfirm.classList.remove('hidden');
+
+                        // wire confirm button
+                        confirmCitaBtn.onclick = async function () {
+                            try {
+                                modalConfirm.classList.add('hidden');
+                                confirmCitaBtn.disabled = true;
+                                const orig = confirmCitaBtn.textContent;
+                                confirmCitaBtn.textContent = 'Procesando...';
+                                await performRequest();
+                                confirmCitaBtn.textContent = orig;
+                            } finally {
+                                confirmCitaBtn.disabled = false;
+                            }
+                        };
+
+                        // wire cancel button
+                        if (cancelCitaConfirmBtn) cancelCitaConfirmBtn.onclick = function () {
+                            modalConfirm.classList.add('hidden');
+                            formMessage.className = 'text-sm text-gray-600';
+                            formMessage.textContent = 'Acción cancelada.';
+                        };
+
+                        return;
+                    }
+
+                    // fallback to simple confirm dialog if styled area not present
+                    if (!confirm(confirmMsg)) {
+                        formMessage.className = 'text-sm text-gray-600';
+                        formMessage.textContent = 'Acción cancelada.';
+                        return;
+                    }
+
+                    // if no styled confirm, proceed immediately
+                    await performRequest();
+                });
+                // ensure min is set on initial load too (in case modal is used without reopening)
+                setMinDate();
+                // Inicializa los selects de estado y aplica colores
+                function _statusKey(s) { return String(s || '').toLowerCase(); }
+                function _applyStatusClass(el) {
+                    const key = _statusKey(el.dataset.status || el.value);
+                    const base = 'status-select inline-flex items-center px-3 py-1 rounded-md text-sm font-medium border border-[#E0D5C5] focus:ring-[#6B4F2B] focus:border-[#6B4F2B] text-[#5A3E2A]';
+                    let extra = ' text-white';
+                    if (key === 'pendiente' || key === 'pend') extra = ' bg-[#F4C430] text-white';
+                    else if (key === 'confirmada' || key === 'confirmado' || key === 'confirm') extra = ' bg-green-500 text-white';
+                    else if (key === 'cancelada' || key === 'cancelado' || key === 'cancel') extra = ' bg-red-500 text-white';
+                    el.className = base + extra;
+                    // ensure the visible select text is white when using colored backgrounds
+                    try {
+                        const keyLower = (key || '').toString().toLowerCase();
+                        if (keyLower === 'pendiente' || keyLower === 'pend' || keyLower === 'confirmada' || keyLower === 'confirmado' || keyLower === 'confirm' || keyLower === 'cancelada' || keyLower === 'cancelado' || keyLower === 'cancel') {
+                            el.style.color = 'white';
+                        } else {
+                            el.style.color = '';
+                        }
+                    } catch (e) { }
+                    Array.from(el.options).forEach(o => { o.selected = (_statusKey(o.value) === key); try { o.style.color = 'white'; } catch (e) { } });
+                    // Toggle visibility of the edit button in the same row: only visible for 'pendiente'
+                    try {
+                        const row = el.closest && el.closest('tr');
+                        if (row) {
+                            const btn = row.querySelector && row.querySelector('.btn-edit');
+                            if (btn) {
+                                if (key === 'pendiente' || key === 'pend') btn.classList.remove('hidden');
+                                else btn.classList.add('hidden');
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                document.querySelectorAll('.status-select').forEach(function (sel) {
+                    try {
+                        _applyStatusClass(sel);
+                        sel.addEventListener('change', function () {
+                            try {
+                                const el = this;
+                                const prev = el.dataset.status || el.getAttribute('data-status') || '';
+                                const next = el.value;
+                                // Optimistically update UI
+                                el.dataset.status = next;
+                                _applyStatusClass(el);
+
+                                const id = el.dataset.id;
+                                if (!id) return;
+
+                                // disable while updating
+                                el.disabled = true;
+
+                                fetch(`/api/citas/${encodeURIComponent(id)}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ status: next })
+                                }).then(async function (res) {
+                                    el.disabled = false;
+                                    if (!res.ok) {
+                                        let body = null;
+                                        try { body = await res.json(); } catch (e) { }
+                                        const errMsg = (body && body.error) ? body.error : 'Error actualizando estado';
+                                        alert(errMsg);
+                                        // revert UI
+                                        el.value = prev;
+                                        el.dataset.status = prev;
+                                        _applyStatusClass(el);
+                                    }
+                                }).catch(function () {
+                                    el.disabled = false;
+                                    alert('Error de red al actualizar estado');
+                                    el.value = prev;
+                                    el.dataset.status = prev;
+                                    _applyStatusClass(el);
+                                });
+                            } catch (e) { console.debug && console.debug(e); }
+                        });
+                    } catch (e) { console.debug && console.debug(e); }
+                });
+
+                // Filter by estado: listen changes on #filterEstado and toggle rows
+                (function _setupEstadoFilter(){
+                    try {
+                        const filter = document.getElementById('filterEstado');
+                        const tbodyEl = document.querySelector('table tbody');
+                        if (!filter || !tbodyEl) return;
+                        function applyFilter() {
+                            const v = (filter.value || '').toString().toLowerCase();
+                            let visible = 0;
+                            Array.from(tbodyEl.querySelectorAll('tr')).forEach(row => {
+                                // look for the status select inside the row
+                                const sel = row.querySelector && row.querySelector('.status-select');
+                                if (!sel) return; // skip non-data rows
+                                const rowStatus = (sel.dataset.status || sel.value || '').toString().toLowerCase();
+                                if (!v || rowStatus === v) {
+                                    row.style.display = '';
+                                    visible++;
+                                } else {
+                                    row.style.display = 'none';
+                                }
+                            });
+                            // show/hide the no-results row
+                            const noRow = document.getElementById('noResultsRow');
+                            if (noRow) noRow.style.display = (visible ? 'none' : '');
+                        }
+                        filter.addEventListener('change', applyFilter);
+                        // init
+                        applyFilter();
+                    } catch (e) { console.debug && console.debug(e); }
+                })();
+
+                // Filter by text search (cliente, servicio, teléfono) with debounce
+                (function _setupTextSearch(){
+                    try {
+                        const input = document.getElementById('searchInput');
+                        const tbodyEl = document.querySelector('table tbody');
+                        const estadoFilter = document.getElementById('filterEstado');
+                        if (!input || !tbodyEl) return;
+                        let timer = null;
+
+                        function applySearch() {
+                            const q = (input.value || '').toString().trim().toLowerCase();
+                            let visible = 0;
+                            Array.from(tbodyEl.querySelectorAll('tr')).forEach(row => {
+                                // find status select to determine data rows
+                                const sel = row.querySelector && row.querySelector('.status-select');
+                                if (!sel) return; // skip non-data rows (e.g. no-results row)
+
+                                const cells = row.querySelectorAll('td');
+                                const client = (cells[2] && cells[2].textContent || '').toString().toLowerCase();
+                                const service = (cells[3] && cells[3].textContent || '').toString().toLowerCase();
+                                const phone = (cells[4] && cells[4].textContent || '').toString().toLowerCase();
+
+                                const matchesText = !q || client.indexOf(q) !== -1 || service.indexOf(q) !== -1 || phone.indexOf(q) !== -1;
+
+                                // also respect estado filter if active
+                                const estadoVal = (estadoFilter && estadoFilter.value) ? estadoFilter.value.toString().toLowerCase() : '';
+                                const rowStatus = (sel.dataset.status || sel.value || '').toString().toLowerCase();
+                                const matchesEstado = !estadoVal || rowStatus === estadoVal;
+
+                                const show = matchesText && matchesEstado;
+                                row.style.display = show ? '' : 'none';
+                                if (show) visible++;
+                            });
+                            const noRow = document.getElementById('noResultsRow');
+                            if (noRow) noRow.style.display = (visible ? 'none' : '');
+                        }
+
+                        input.addEventListener('input', function () {
+                            clearTimeout(timer);
+                            timer = setTimeout(applySearch, 250);
+                        });
+
+                        // ensure search re-applies when estado filter changes
+                        if (estadoFilter) estadoFilter.addEventListener('change', function () { clearTimeout(timer); timer = setTimeout(applySearch, 0); });
+
+                        // run initially to apply empty query + estado filter
+                        applySearch();
+                    } catch (e) { console.debug && console.debug(e); }
+                })();
+
+                // --- Edit button wiring: open modal and populate data ---
+                async function openEditModal(id, row) {
+                    if (!id) return;
+                    try {
+                        // open modal and ensure options loaded
+                        await openModal();
+                        // fetch appointment details
+                        const resp = await fetch(`/api/citas/${id}`);
+                        const data = await resp.json();
+                        const a = (data && data.ok) ? (data.appointment || data.cita || data) : data;
+                        if (!a) {
+                            formMessage.className = 'text-sm text-red-600';
+                            formMessage.textContent = 'No se encontró la cita.';
+                            return;
+                        }
+                        appointmentIdEl.value = id;
+                        modalTitle.textContent = 'Editar cita';
+                        try {
+                            const submitText = document.getElementById('submitTextCita');
+                            if (submitText) submitText.textContent = 'Guardar cambios';
+                        } catch (e) { /* ignore */ }
+
+                        // set date
+                        const dateInput = document.querySelector('[name="fecha"]');
+                        if (dateInput && a.date) dateInput.value = a.date;
+                        // set service if service id available
+                        if (a.serviceId || (a.raw && (a.raw.servicio || a.raw.service || a.raw.servicio_id || a.raw.service_id))) {
+                            const svcId = a.serviceId || (a.raw && (a.raw.servicio || a.raw.service || a.raw.servicio_id || a.raw.service_id));
+                            try { selectServicios.value = String(svcId); } catch (e) { }
+                        }
+                        // populate available hours and ensure current time option exists
+                        await updateAvailableHours();
+                        if (a.time) {
+                            const exists = Array.from(selectHora.options).some(o => o.value === a.time);
+                            if (!exists) {
+                                const opt = document.createElement('option'); opt.value = a.time; opt.text = a.time; selectHora.appendChild(opt);
+                            }
+                            try { selectHora.value = a.time; } catch (e) { }
+                        }
+
+                        // client: prefer registered id
+                        if (a.clienteId || a.cliente_id) {
+                            registeredBlock.classList.remove('hidden');
+                            guestBlock.classList.add('hidden');
+                            try { selectClientes.value = String(a.clienteId || a.cliente_id); } catch (e) { }
+                        } else if (a.clienteName || a.cliente_name || a.clientName) {
+                            registeredBlock.classList.add('hidden');
+                            guestBlock.classList.remove('hidden');
+                            const gname = a.clienteName || a.cliente_name || a.clientName;
+                            document.getElementById('inputGuestName').value = gname;
+                        } else {
+                            // fallback: try to read from row cells
+                            if (row) {
+                                const cells = row.querySelectorAll('td');
+                                if (cells && cells.length >= 3) {
+                                    const name = cells[2].textContent && cells[2].textContent.trim();
+                                    if (name) { registeredBlock.classList.add('hidden'); guestBlock.classList.remove('hidden'); document.getElementById('inputGuestName').value = name; }
+                                }
+                            }
+                        }
+
+                        // phone
+                        if (a.telefono || a.phone) document.getElementById('inputPhone').value = a.telefono || a.phone;
+
+                        // apply status styling if provided
+                        if (a.status) {
+                            try {
+                                const sel = row && row.querySelector && row.querySelector('.status-select');
+                                if (sel) { sel.dataset.status = a.status; _applyStatusClass(sel); }
+                            } catch (e) { }
+                        }
+
+                    } catch (e) {
+                        formMessage.className = 'text-sm text-red-600';
+                        formMessage.textContent = 'Error cargando datos de la cita.';
+                    }
+                }
+
+                // attach click handlers to edit buttons (delegation for future rows)
+                document.addEventListener('click', function (ev) {
+                    const btn = ev.target.closest && ev.target.closest('.btn-edit');
+                    if (!btn) return;
+                    ev.preventDefault();
+                    const row = btn.closest && btn.closest('tr');
+                    let id = null;
+                    try {
+                        const sel = row && row.querySelector && row.querySelector('.status-select');
+                        if (sel) id = sel.dataset.id;
+                    } catch (e) { }
+                    if (!id) {
+                        // try data-id on button
+                        id = btn.dataset && btn.dataset.id;
+                    }
+                    openEditModal(id, row);
+                });
+
+            })();
+        </script>
+    </div>

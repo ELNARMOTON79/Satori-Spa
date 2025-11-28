@@ -3,28 +3,20 @@ const morgan = require('morgan');
 const path = require('path');
 const exphbs = require('express-handlebars');
 const session = require('express-session');
-const Handlebars = require('handlebars'); // Added Handlebars
-const multer = require('multer'); // Added multer
 
 const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
-app.engine('.hbs', exphbs.create({
-    defaultLayout: 'dashboard', // Ahora dashboard.hbs es el layout principal
+const hbs = exphbs.create({
+    defaultLayout: 'main',
     extname: '.hbs',
-    layoutsDir: app.get('views'), // Busca layouts directamente en la carpeta de vistas
-    helpers: { // Registered Handlebars helpers
-        ifEquals: function(arg1, arg2, options) {
-            if (!options || !options.fn || !options.inverse) {
-                console.error("'ifEquals' helper called without a block. Make sure to use {{#ifEquals ...}}...{{/ifEquals}}");
-                return ''; 
-            }
-            const val1 = String(arg1 || '').trim().toLowerCase();
-            const val2 = String(arg2 || '').trim().toLowerCase();
-            return (val1 === val2) ? options.fn(this) : options.inverse(this);
-        }
+    // ensure partials are loaded from views/partials
+    partialsDir: path.join(__dirname, 'views', 'partials'),
+    helpers: {
+        eq: function (a, b) { return a === b; }
     }
-}).engine);
+});
+app.engine('.hbs', hbs.engine);
 app.set('view engine', '.hbs');
 
 app.use(morgan('dev'));
@@ -35,6 +27,22 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+// Middleware: prevent caching of pages for authenticated users so Back button won't reveal them
+app.use((req, res, next) => {
+    try {
+        if (req.session && req.session.user) {
+            res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
+            res.set('Surrogate-Control', 'no-store');
+        }
+    } catch (e) {
+        // Non-fatal, continue request pipeline and log for debugging
+        console.error('Error setting cache headers:', e && e.message);
+    }
+    next();
+});
 
 //Rutas
 app.use(require('./routes/index'));

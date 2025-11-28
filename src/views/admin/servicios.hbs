@@ -1,0 +1,1001 @@
+<div class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
+    <style>
+        /* Main content text in brown for consistency with admin views */
+        .main-text-brown, .main-text-brown * { color: #5A3E2A !important; }
+        /* Preserve explicitly white text when used */
+        .main-text-brown .text-white, .main-text-brown .text-white * { color: #ffffff !important; }
+        /* Preserve action button/icon colors in this view */
+        .main-text-brown .editar-servicio, .main-text-brown .editar-servicio * { color: #6B4F2B !important; }
+        .main-text-brown .delete-servicio-btn, .main-text-brown .delete-servicio-btn * { color: #DC2626 !important; }
+        .main-text-brown button[aria-label="Editar servicio"] i, .main-text-brown button[aria-label="Editar servicio"] * { color: #6B4F2B !important; }
+        .main-text-brown button[aria-label="Eliminar servicio"] i, .main-text-brown button[aria-label="Eliminar servicio"] * { color: #DC2626 !important; }
+    </style>
+    <div class="flex h-screen">
+    {{> admin_sidebar sections=sections active=active user=user}}
+    <main class="flex-1 p-6 flex flex-col min-h-0 overflow-hidden main-text-brown">
+
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-0">
+                    <i class="fa-solid fa-concierge-bell mr-2" aria-hidden="true"></i>
+                    <h1 class="text-2xl font-bold">Servicios</h1>
+                </div>
+                <a href="#" class="inline-flex items-center gap-2 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#efe3cc] focus:outline-none focus:ring-2 focus:ring-[#E0D5C5]" aria-label="Nuevo Servicio">
+                    <i class="fa-solid fa-plus h-5 w-5 text-[#6B4F2B]" aria-hidden="true"></i>
+                    <span class="font-medium text-sm text-[#6B4F2B]">Nuevo Servicio</span>
+                </a>
+            </div>
+
+            <!-- Search & Category Filter (similar to Usuarios design) -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 w-full md:w-1/2">
+                    <label for="serviceSearch" class="sr-only">Buscar servicios</label>
+                    <i class="fa-solid fa-magnifying-glass text-gray-500 pl-2" aria-hidden="true"></i>
+                    <input id="serviceSearch" type="search" placeholder="Buscar por nombre o descripción" class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Buscar servicios" />
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="serviceCategory" class="text-sm font-medium text-gray-700 inline-flex items-center">
+                        <i class="fa-solid fa-filter mr-2 text-gray-600" aria-hidden="true"></i>
+                        Filtrar por categoría:
+                    </label>
+                    <select id="serviceCategory" class="appearance-none rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Filtrar por categoría">
+                        <option value="all">Todos</option>
+                        {{#if categories}}
+                            {{#each categories}}
+                                <option value="{{id}}">{{name}}</option>
+                            {{/each}}
+                        {{else}}
+                            <option value="masaje">Masajes</option>
+                            <option value="faciales">Faciales</option>
+                        {{/if}}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Listado de servicios -->
+            <section aria-labelledby="servicesHeading" class="mb-8 overflow-auto flex-1">
+                <h2 id="servicesHeading" class="sr-only">Listado de servicios</h2>
+
+                {{#if servicios}}
+                    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {{#each servicios}}
+                            <article class="bg-white rounded-2xl shadow p-4 flex flex-col overflow-hidden" data-id="{{id}}" data-servicio="{{servicio}}" data-categoria="{{categoria}}" data-categoria-nombre="{{categoriaNombre}}" data-descripcion="{{descripcion}}" data-precio="{{precio}}" data-imagen="{{imagen}}" data-estado="{{estado}}">
+                                <div class="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+                                    {{#if imagen}}
+                                        <img src="{{imagen}}" alt="{{servicio}}" class="object-cover w-full h-full" />
+                                    {{else}}
+                                        <div class="text-gray-400 text-sm">Imagen</div>
+                                    {{/if}}
+                                </div>
+
+                                <div class="flex-1">
+                                    <h3 class="text-base font-semibold text-gray-900 mb-2">{{servicio}}</h3>
+                                    <p class="text-sm text-gray-600 mb-4">{{descripcion}}</p>
+                                </div>
+
+                                    <div class="mt-2 flex items-center justify-between">
+                                    <div class="text-sm text-gray-700 font-medium">{{#if categoriaNombre}}{{categoriaNombre}}{{else}}{{#if categoria}}{{categoria}}{{else}}Servicio{{/if}}{{/if}}</div>
+                                    <div class="text-lg font-semibold text-[#6B4F2B]">{{#if precio}}${{precio}}{{else}}--{{/if}}</div>
+                                    <div class="text-sm text-gray-500">{{#if duracion}}{{duracion}} min{{else}}--{{/if}}</div>
+                                </div>
+                                <!-- Botones de acción (diseño solamente) -->
+                                    <div class="mt-4 flex items-center justify-end gap-3">
+                                    <button type="button" class="editar-servicio inline-flex items-center gap-2 px-3 py-1.5 bg-[#F5EBDD] text-[#6B4F2B] rounded-lg border border-[#E0D5C5] hover:bg-[#efe3cc] focus:outline-none focus:ring-2 focus:ring-[#E0D5C5]" aria-label="Editar servicio">
+                                        <i class="fa-solid fa-pen w-4 h-4" aria-hidden="true"></i>
+                                        <span class="text-sm font-medium">Editar</span>
+                                    </button>
+
+                                    <button type="button" class="delete-servicio-btn inline-flex items-center gap-2 px-3 py-1.5 bg-white text-red-600 rounded-lg border border-red-200 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200" aria-label="Eliminar servicio">
+                                        <i class="fa-solid fa-trash w-4 h-4" aria-hidden="true"></i>
+                                        <span class="text-sm font-medium">Eliminar</span>
+                                    </button>
+                                </div>
+                            </article>
+                        {{/each}}
+                    </div>
+                {{else}}
+                    <p class="text-gray-500">No hay servicios disponibles.</p>
+                {{/if}}
+            </section>
+
+        </main>
+    </div>
+    </div>
+
+    <!-- Modal: Nuevo Servicio -->
+    <div id="nuevoServicioModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 overflow-visible max-h-[90vh] overflow-auto">
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+                <h2 class="text-lg font-semibold inline-flex items-center gap-2"><i class="fa-solid fa-hands-holding-circle text-[#6B4F2B]"></i> Nuevo Servicio</h2>
+                <button type="button" id="closeServicioModalBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal nuevo servicio">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <div id="servicioModalAlert" class="hidden mb-4"></div>
+
+                <form id="nuevoServicioForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="servicio" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-tag text-gray-500"></i> Servicio</label>
+                            <input id="servicio" name="servicio" type="text" maxlength="50" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]+$" title="Solo letras, espacios, apóstrofes y guiones" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Nombre del servicio" aria-label="Nombre del servicio" />
+                            <div class="text-xs text-gray-500 mt-1"><span id="servicioCount">0</span>/50</div>
+                        </div>
+
+                        <div>
+                            <label for="servicioCategoria" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-tags text-gray-500"></i> Categoría</label>
+                            <select id="servicioCategoria" name="categoria" required class="mt-1 block w-full rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Categoría del servicio">
+                                    <option value="">Seleccionar categoría</option>
+                                    {{#if categories}}
+                                        {{#each categories}}
+                                            <option value="{{id}}">{{name}}</option>
+                                        {{/each}}
+                                    {{else}}
+                                        <option value="Masaje">Masajes</option>
+                                        <option value="Faciales">Faciales</option>
+                                    {{/if}}
+                                </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="servicioDescripcion" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-info text-gray-500"></i> Descripción</label>
+                            <textarea id="servicioDescripcion" name="descripcion" rows="3" maxlength="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Descripción breve" aria-label="Descripción del servicio"></textarea>
+                            <div class="text-xs text-gray-500 mt-1"><span id="descripcionCount">0</span>/100</div>
+                        </div>
+
+                        <div>
+                            <label for="servicioPrecio" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-dollar-sign text-gray-500"></i> Precio</label>
+                            <input id="servicioPrecio" name="precio" type="text" inputmode="decimal" pattern="^\d{1,3}(?:\.\d{1,2})?$" title="Ingrese un número válido (hasta 2 decimales)" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="0.00" aria-label="Precio" required />
+                        </div>
+
+                        <div>
+                            <label for="servicioEstado" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-toggle-on text-gray-500"></i> Estado</label>
+                            <select id="servicioEstado" name="estado" required class="mt-1 block w-full rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Estado del servicio">
+                                <option value="">Seleccionar estado</option>
+                                <option value="disponible">Disponible</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="servicioImagen" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-image text-gray-500"></i> Imagen</label>
+                            <div class="mt-1 flex items-center gap-3">
+                                <div class="flex items-center gap-3">
+                                    <label for="servicioImagen" class="inline-flex items-center gap-2 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] cursor-pointer text-sm text-[#6B4F2B]">Elegir imagen</label>
+                                    <span id="servicioImagenFilename" class="text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                </div>
+
+                                <input id="servicioImagen" name="imagen" type="file" accept="image/*" class="sr-only" aria-label="Imagen del servicio" />
+
+                                <div class="flex items-center gap-2">
+                                    <div id="servicioImagePreview" class="w-20 h-14 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">Previsualizar</div>
+                                    <button type="button" id="clearServicioImageBtn" class="hidden p-1 rounded bg-white border text-gray-600 hover:bg-gray-50" aria-label="Quitar imagen">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmación antes de crear-->
+                    <div id="servicioConfirm" class="hidden mb-4 p-4 rounded bg-yellow-50 border">
+                        <p id="servicioConfirmText" class="text-sm text-gray-800">¿Crear nuevo servicio?</p>
+                        <div class="mt-3 flex justify-end gap-2">
+                            <button type="button" id="servicioCancelConfirmBtn" class="px-3 py-1 rounded bg-white border text-gray-700">Cancelar</button>
+                            <button type="button" id="servicioConfirmBtn" class="px-3 py-1 rounded bg-[#6B4F2B] text-white">Confirmar</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" id="cancelServicioBtn" class="px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50">Cancelar</button>
+                        <button type="submit" id="saveServicioBtn" class="px-4 py-2 rounded bg-[#6B4F2B] text-white hover:bg-[#5a3f23]">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+    var searchInput = document.getElementById('serviceSearch');
+        var categorySelect = document.getElementById('serviceCategory');
+        var container = document.querySelector('section[aria-labelledby="servicesHeading"]');
+        var cards = container ? Array.prototype.slice.call(container.querySelectorAll('article[data-servicio]')) : [];
+
+        function normalize(s){ return (s||'').toString().toLowerCase().trim(); }
+
+        function applyFilter(){
+            var q = normalize(searchInput && searchInput.value);
+            var catRaw = categorySelect ? (categorySelect.value || 'all') : 'all';
+            var cat = (catRaw || '').toString().toLowerCase().trim();
+            var anyVisible = false;
+
+            cards.forEach(function(card){
+                var nombre = normalize(card.getAttribute('data-servicio'));
+                var desc = normalize(card.getAttribute('data-descripcion'));
+                var categoriaRaw = card.getAttribute('data-categoria') || '';
+                var categoriaNombreRaw = card.getAttribute('data-categoria-nombre') || '';
+                var categoria = (categoriaRaw || '').toString().toLowerCase();
+                var categoriaNombre = (categoriaNombreRaw || '').toString().toLowerCase();
+
+                var matchesQuery = !q || nombre.indexOf(q) !== -1 || desc.indexOf(q) !== -1;
+                var matchesCategory = false;
+
+                // If filter is 'all' show everything
+                if(catRaw === 'all' || cat === 'all') matchesCategory = true;
+                else {
+                    // Exact id match (raw comparison), or match by name (raw or normalized)
+                    if(categoriaRaw === catRaw || categoriaNombreRaw === catRaw) matchesCategory = true;
+                    else if(categoria.indexOf(cat) !== -1 || categoriaNombre.indexOf(cat) !== -1) matchesCategory = true;
+                }
+
+                if(matchesQuery && matchesCategory){
+                    card.style.display = '';
+                    anyVisible = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Optionally show a no-results message
+            var noEl = document.getElementById('noServicesMessage');
+            if(noEl){ if(!anyVisible) noEl.classList.remove('hidden'); else noEl.classList.add('hidden'); }
+        }
+
+        function debounce(fn, wait){ var t; return function(){ var args = arguments; clearTimeout(t); t = setTimeout(function(){ fn.apply(null, args); }, wait); }; }
+
+        // Restrict search input to letters (including accents), spaces, apostrophes and hyphens only
+        function sanitizeSearchValue(v){
+            if(!v) return '';
+            // allow letters (including Latin accents), spaces, apostrophes and hyphens
+            return v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'\-]/g, '');
+        }
+
+        function onSearchInput(){
+            // sanitize value then apply filter
+            if(!searchInput) return;
+            var old = searchInput.value;
+            var cleaned = sanitizeSearchValue(old);
+            if(old !== cleaned) {
+                // preserve cursor position as best effort
+                var pos = searchInput.selectionStart || 0;
+                searchInput.value = cleaned;
+                try{ searchInput.setSelectionRange(pos-1 < 0 ? 0 : pos-1, pos-1 < 0 ? 0 : pos-1); }catch(e){}
+            }
+            applyFilter();
+        }
+
+        function onlyLettersSearchKeydown(e){
+            // Allow control keys: backspace, delete, arrows, tab
+            if(e.keyCode === 8 || e.keyCode === 46 || (e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode === 9) return;
+            var k = e.key;
+            if(!k) return;
+            var allowedRe = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'\-]$/;
+            if(!allowedRe.test(k)){
+                e.preventDefault();
+            }
+        }
+
+        if(searchInput) {
+            searchInput.addEventListener('keydown', onlyLettersSearchKeydown);
+            searchInput.addEventListener('input', debounce(onSearchInput, 180));
+            // sanitize initial value
+            searchInput.value = sanitizeSearchValue(searchInput.value || '');
+        }
+        if(categorySelect) categorySelect.addEventListener('change', applyFilter);
+
+        // Initialize on load
+        applyFilter();
+    })();
+</script>
+
+<script>
+    (function(){
+        var openBtn = document.querySelector('[aria-label="Nuevo Servicio"]');
+        var modal = document.getElementById('nuevoServicioModal');
+        var closeBtn = document.getElementById('closeServicioModalBtn');
+        var cancelBtn = document.getElementById('cancelServicioBtn');
+        var form = document.getElementById('nuevoServicioForm');
+        var saveBtn = document.getElementById('saveServicioBtn');
+        var preview = document.getElementById('servicioImagePreview');
+        var inputImagen = document.getElementById('servicioImagen');
+        var clearImgBtn = document.getElementById('clearServicioImageBtn');
+
+        function openModal(e){
+            e && e.preventDefault();
+            if(!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.setAttribute('aria-hidden','false');
+            // focus first input
+            setTimeout(function(){ var first = document.getElementById('servicio'); if(first) first.focus(); }, 40);
+        }
+
+        function closeModal(e){
+            e && e.preventDefault();
+            if(!modal) return;
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden','true');
+            openBtn && openBtn.focus();
+            // reset form (design-only)
+            if(form){ form.reset(); if(preview) { preview.textContent = 'Previsualizar'; preview.style.backgroundImage = ''; }
+                if(clearImgBtn) clearImgBtn.classList.add('hidden');
+                var fn = document.getElementById('servicioImagenFilename'); if(fn) fn.textContent = 'Ningún archivo seleccionado';
+            }
+            var alert = document.getElementById('servicioModalAlert'); if(alert) { alert.className='hidden'; alert.textContent=''; }
+        }
+
+        function showAlert(type, text){
+            var alertEl = document.getElementById('servicioModalAlert');
+            if(!alertEl) return;
+            alertEl.className = '';
+            alertEl.classList.add('mb-4','p-3','rounded');
+            if(type === 'error') alertEl.classList.add('bg-red-100','text-red-700');
+            else if(type === 'success') alertEl.classList.add('bg-green-100','text-green-700');
+            else alertEl.classList.add('bg-yellow-100','text-yellow-700');
+            alertEl.textContent = text;
+            alertEl.classList.remove('hidden');
+        }
+
+        // Basic validation (design-only)
+        function validate(payload){
+            // servicio: required, letters and basic punctuation only, max 50
+            if(!payload.servicio || !payload.servicio.trim()) return 'El nombre del servicio es requerido.';
+            var nombre = payload.servicio.trim();
+            if(nombre.length > 50) return 'El nombre no puede tener más de 50 caracteres.';
+            var nombreRe = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]+$/;
+            if(!nombreRe.test(nombre)) return 'El nombre solo puede contener letras, espacios, apóstrofes y guiones.';
+
+            // descripcion: optional but if present max 100
+            if(payload.descripcion && payload.descripcion.trim().length > 100) return 'La descripción no puede exceder 100 caracteres.';
+
+            // categoria: required
+            if(!payload.categoria || !payload.categoria.trim()) return 'La categoría es requerida.';
+
+            // estado: required
+            if(!payload.estado || !payload.estado.trim()) return 'El estado es requerido.';
+
+            // precio: required and numeric with up to 2 decimals
+            if(payload.precio === undefined || payload.precio === null || String(payload.precio).trim() === '') return 'El precio es requerido.';
+            var precioStr = String(payload.precio).trim();
+            var precioRe = /^\d{1,3}(?:\.\d{1,2})?$/; // up to 3 digits before decimal and up to 2 decimals
+            if(!precioRe.test(precioStr)) return 'Precio inválido. Use hasta 2 decimales.';
+
+            return null;
+        }
+
+        // Image preview + clear button (client-side only)
+        if(inputImagen && preview){
+            inputImagen.addEventListener('change', function(ev){
+                var f = ev.target.files && ev.target.files[0];
+                var filenameEl = document.getElementById('servicioImagenFilename');
+                if(!f){ if(filenameEl) filenameEl.textContent = 'Ningún archivo seleccionado'; preview.textContent = 'Previsualizar'; preview.style.backgroundImage = ''; if(clearImgBtn) clearImgBtn.classList.add('hidden'); return; }
+                if(filenameEl) filenameEl.textContent = f.name;
+                if(!f.type.startsWith('image/')){ preview.textContent = 'No es una imagen'; if(clearImgBtn) clearImgBtn.classList.add('hidden'); return; }
+                var reader = new FileReader();
+                reader.onload = function(){ preview.style.backgroundImage = 'url("'+reader.result+'")'; preview.style.backgroundSize='cover'; preview.style.backgroundPosition='center'; preview.textContent = ''; if(clearImgBtn) clearImgBtn.classList.remove('hidden'); };
+                reader.readAsDataURL(f);
+            });
+        }
+
+        if(clearImgBtn){
+            clearImgBtn.addEventListener('click', function(e){
+                e && e.preventDefault();
+                if(inputImagen){ inputImagen.value = ''; }
+                if(preview){ preview.style.backgroundImage = ''; preview.textContent = 'Previsualizar'; }
+                var filenameEl = document.getElementById('servicioImagenFilename'); if(filenameEl) filenameEl.textContent = 'Ningún archivo seleccionado';
+                clearImgBtn.classList.add('hidden');
+                inputImagen && inputImagen.focus();
+            });
+        }
+
+        if(openBtn) openBtn.addEventListener('click', openModal);
+        if(closeBtn) closeBtn.addEventListener('click', closeModal);
+        if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(modal && !modal.classList.contains('hidden')) closeModal(); }});
+
+        var confirmArea = document.getElementById('servicioConfirm');
+        var confirmText = document.getElementById('servicioConfirmText');
+        var confirmBtn = document.getElementById('servicioConfirmBtn');
+        var cancelConfirmBtn = document.getElementById('servicioCancelConfirmBtn');
+
+        if(form){
+            form.addEventListener('submit', function(e){
+                e && e.preventDefault();
+                var payload = {
+                    servicio: (document.getElementById('servicio')||{}).value,
+                    categoria: (document.getElementById('servicioCategoria')||{}).value,
+                    descripcion: (document.getElementById('servicioDescripcion')||{}).value,
+                    precio: (document.getElementById('servicioPrecio')||{}).value,
+                    estado: (document.getElementById('servicioEstado')||{}).value
+                };
+
+                var err = validate(payload);
+                if(err){ showAlert('error', err); return; }
+
+                // Show confirmation area (design-only)
+                if(confirmArea && confirmText){
+                    confirmText.textContent = '¿Crear nuevo servicio "' + (payload.servicio || '') + '"?';
+                    confirmArea.classList.remove('hidden');
+                }
+
+                async function doCreate(){
+                    // hide confirm area and show loading
+                    if(confirmArea) confirmArea.classList.add('hidden');
+                    if(saveBtn) saveBtn.disabled = true;
+                    showAlert('success', 'Creando servicio...');
+
+                    try {
+                        var formEl = document.getElementById('nuevoServicioForm');
+                        var fd = new FormData(formEl);
+
+                        // If an image file input exists, append its file (FormData already does this when using the form element)
+                        // Send request
+                        var resp = await fetch('/api/servicios', { method: 'POST', body: fd });
+                        var json = await resp.json();
+                        if(!resp.ok || !json || !json.ok){
+                            var err = (json && json.error) ? json.error : 'Error creando servicio';
+                            showAlert('error', err);
+                            if(saveBtn) saveBtn.disabled = false;
+                            return;
+                        }
+
+                        showAlert('success', 'Servicio creado correctamente.');
+                        // small delay so user sees the success message, then close and reload
+                        setTimeout(function(){
+                            if(saveBtn) saveBtn.disabled = false;
+                            closeModal();
+                            // reload para que la lista muestre el nuevo servicio
+                            window.location.reload();
+                        }, 800);
+                    } catch (e) {
+                        showAlert('error', e && e.message ? e.message : 'Error de red');
+                        if(saveBtn) saveBtn.disabled = false;
+                    }
+                }
+
+                if(confirmBtn) confirmBtn.onclick = doCreate;
+                if(cancelConfirmBtn) cancelConfirmBtn.onclick = function(){ if(confirmArea) confirmArea.classList.add('hidden'); };
+            });
+        }
+    })();
+</script>
+
+<script>
+    (function(){
+        var nombreEl = document.getElementById('servicio');
+        var descEl = document.getElementById('servicioDescripcion');
+        var precioEl = document.getElementById('servicioPrecio');
+        var servicioCount = document.getElementById('servicioCount');
+        var descripcionCount = document.getElementById('descripcionCount');
+
+        function onlyLettersInput(e){
+            // allow control keys
+            var key = e.key;
+            if(!key) return;
+            var allowedRe = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]$/;
+            // Allow Backspace, Delete, Arrow keys, Tab
+            if(e.keyCode === 8 || e.keyCode === 46 || (e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode === 9) return;
+            if(!allowedRe.test(key)){
+                e.preventDefault();
+            }
+        }
+
+        function sanitizeNombre(){
+            if(!nombreEl) return;
+            var v = nombreEl.value || '';
+            // remove digits and disallowed symbols
+            v = v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]/g, '');
+            if(v.length > 50) v = v.slice(0,50);
+            var prev = nombreEl.value;
+            if(prev !== v) nombreEl.value = v;
+            if(servicioCount) servicioCount.textContent = v.length;
+        }
+
+        function sanitizeDescripcion(){
+            if(!descEl) return;
+            var v = descEl.value || '';
+            // remove digits and disallowed symbols, allow letters, accents, spaces, apostrophes, hyphens and new lines
+            v = v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s\'\-\n]/g, '');
+            if(v.length > 100) v = v.slice(0,100);
+            if(descEl.value !== v) descEl.value = v;
+            if(descripcionCount) descripcionCount.textContent = v.length;
+        }
+
+        function sanitizePrecio(e){
+            if(!precioEl) return;
+            var v = precioEl.value || '';
+            // allow digits and dot only, remove other chars
+            v = v.replace(/[^0-9.]/g, '');
+            // ensure only one dot
+            var parts = v.split('.');
+            if(parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+            // limit decimals to 2
+            if(v.indexOf('.') !== -1){
+                var idx = v.indexOf('.');
+                var intPart = v.slice(0, idx);
+                var decPart = v.slice(idx+1).slice(0,2);
+                // limit integer part to max 3 digits
+                if(intPart.length > 3) intPart = intPart.slice(0,3);
+                v = intPart + (decPart ? '.' + decPart : '');
+            } else {
+                // no decimal point — ensure integer part max 3 digits
+                if(v.length > 3) v = v.slice(0,3);
+            }
+            if(precioEl.value !== v) precioEl.value = v;
+        }
+
+        if(nombreEl){
+            nombreEl.addEventListener('keydown', onlyLettersInput);
+            nombreEl.addEventListener('input', sanitizeNombre);
+            // initialize counter
+            if(servicioCount) servicioCount.textContent = (nombreEl.value||'').length;
+        }
+
+        function onlyLettersTextarea(e){
+            var key = e.key;
+            if(!key) return;
+            // Allow Enter, Backspace, Delete, arrows, Tab
+            if(e.keyCode === 8 || e.keyCode === 46 || (e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode === 9 || e.key === 'Enter') return;
+            var allowedRe = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]$/;
+            if(!allowedRe.test(key)){
+                e.preventDefault();
+            }
+        }
+
+        if(descEl){
+            descEl.addEventListener('keydown', onlyLettersTextarea);
+            descEl.addEventListener('input', sanitizeDescripcion);
+            if(descripcionCount) descripcionCount.textContent = (descEl.value||'').length;
+        }
+
+        if(precioEl){
+            precioEl.addEventListener('input', sanitizePrecio);
+        }
+
+        // Also sanitize on form submit just in case
+        var formMain = document.getElementById('nuevoServicioForm');
+        if(formMain){
+            formMain.addEventListener('submit', function(){ sanitizeNombre(); sanitizeDescripcion(); sanitizePrecio(); });
+        }
+    })();
+</script>
+
+<!-- Editar Servicio Modal (diseño-only) -->
+<div id="editarServicioModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 overflow-visible max-h-[90vh] overflow-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="text-lg font-semibold inline-flex items-center gap-2"><i class="fa-solid fa-pen text-[#6B4F2B]"></i> Editar Servicio</h2>
+            <button type="button" id="closeEditarModalBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal editar servicio">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <div id="editarModalAlert" class="hidden mb-4"></div>
+
+            <form id="editarServicioForm">
+                <input type="hidden" id="editarCardIndex" />
+                <input type="hidden" id="editarCardId" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="editarServicio" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-tag text-gray-500"></i> Servicio</label>
+                        <input id="editarServicio" name="servicio" type="text" maxlength="50" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]+$" title="Solo letras, espacios, apóstrofes y guiones" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Nombre del servicio" aria-label="Nombre del servicio" />
+                        <div class="text-xs text-gray-500 mt-1"><span id="editarServicioCount">0</span>/50</div>
+                    </div>
+
+                    <div>
+                        <label for="editarServicioCategoria" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-tags text-gray-500"></i> Categoría</label>
+                        <select id="editarServicioCategoria" name="categoria" required class="mt-1 block w-full rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Categoría del servicio">
+                            <option value="">Seleccionar categoría</option>
+                            {{#if categories}}
+                                {{#each categories}}
+                                    <option value="{{id}}">{{name}}</option>
+                                {{/each}}
+                            {{else}}
+                                <option value="Masaje">Masajes</option>
+                                <option value="Faciales">Faciales</option>
+                            {{/if}}
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="editarServicioDescripcion" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-info text-gray-500"></i> Descripción</label>
+                        <textarea id="editarServicioDescripcion" name="descripcion" rows="3" maxlength="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Descripción breve (opcional)" aria-label="Descripción del servicio"></textarea>
+                        <div class="text-xs text-gray-500 mt-1"><span id="editarDescripcionCount">0</span>/100</div>
+                    </div>
+
+                    <div>
+                        <label for="editarServicioPrecio" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-dollar-sign text-gray-500"></i> Precio</label>
+                        <input id="editarServicioPrecio" name="precio" type="text" inputmode="decimal" pattern="^\d{1,3}(?:\.\d{1,2})?$" title="Ingrese un número válido (hasta 2 decimales)" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="0.00" aria-label="Precio" required />
+                    </div>
+
+                    <div>
+                        <label for="editarServicioEstado" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-toggle-on text-gray-500"></i> Estado</label>
+                        <select id="editarServicioEstado" name="estado" required class="mt-1 block w-full rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Estado del servicio">
+                            <option value="">Seleccionar estado</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="editarServicioImagen" class="block text-sm font-medium text-gray-700 inline-flex items-center gap-2"><i class="fa-solid fa-image text-gray-500"></i> Imagen</label>
+                        <div class="mt-1 flex items-center gap-3">
+                            <div class="flex items-center gap-3">
+                                <label for="editarServicioImagen" class="inline-flex items-center gap-2 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] cursor-pointer text-sm text-[#6B4F2B]">Elegir imagen</label>
+                                <span id="editarServicioImagenFilename" class="text-sm text-gray-500">Ningún archivo seleccionado</span>
+                            </div>
+
+                            <input id="editarServicioImagen" name="imagen" type="file" accept="image/*" class="sr-only" aria-label="Imagen del servicio" />
+
+                            <div class="flex items-center gap-2">
+                                <div id="editarServicioImagePreview" class="w-20 h-14 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">Previsualizar</div>
+                                <button type="button" id="clearEditarImageBtn" class="hidden p-1 rounded bg-white border text-gray-600 hover:bg-gray-50" aria-label="Quitar imagen">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmación antes de editar (diseño-only) -->
+                <div id="editarConfirm" class="hidden mb-4 p-4 rounded bg-yellow-50 border">
+                    <p id="editarConfirmText" class="text-sm text-gray-800">¿Editar servicio?</p>
+                    <div class="mt-3 flex justify-end gap-2">
+                        <button type="button" id="editarCancelConfirmBtn" class="px-3 py-1 rounded bg-white border text-gray-700">Cancelar</button>
+                        <button type="button" id="editarConfirmBtn" class="px-3 py-1 rounded bg-[#6B4F2B] text-white">Confirmar</button>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" id="cancelEditarBtn" class="px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    <button type="submit" id="saveEditarBtn" class="px-4 py-2 rounded bg-[#6B4F2B] text-white hover:bg-[#5a3f23]">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        function qsa(sel, ctx){ return Array.prototype.slice.call((ctx||document).querySelectorAll(sel)); }
+        function qs(sel, ctx){ return (ctx||document).querySelector(sel); }
+
+        var editarModal = document.getElementById('editarServicioModal');
+        var closeEditarBtn = document.getElementById('closeEditarModalBtn');
+        var cancelEditarBtn = document.getElementById('cancelEditarBtn');
+        var editarForm = document.getElementById('editarServicioForm');
+
+        var editarInputs = {
+            servicio: document.getElementById('editarServicio'),
+            categoria: document.getElementById('editarServicioCategoria'),
+            descripcion: document.getElementById('editarServicioDescripcion'),
+            precio: document.getElementById('editarServicioPrecio'),
+            estado: document.getElementById('editarServicioEstado'),
+            imagenFile: document.getElementById('editarServicioImagen'),
+            imagenPreview: document.getElementById('editarServicioImagePreview'),
+            clearImgBtn: document.getElementById('clearEditarImageBtn'),
+            servicioCount: document.getElementById('editarServicioCount'),
+            descripcionCount: document.getElementById('editarDescripcionCount'),
+            cardIndex: document.getElementById('editarCardIndex'),
+            cardId: document.getElementById('editarCardId')
+        };
+
+        function openEditarModalFromCard(card){
+            if(!editarModal || !card) return;
+            editarInputs.servicio.value = card.getAttribute('data-servicio') || '';
+            editarInputs.categoria.value = card.getAttribute('data-categoria') || '';
+            editarInputs.descripcion.value = card.getAttribute('data-descripcion') || '';
+            editarInputs.precio.value = card.getAttribute('data-precio') || '';
+            // populate hidden id
+            var svcId = card.getAttribute('data-id') || card.getAttribute('data-id') || '';
+            editarInputs.cardId && (editarInputs.cardId.value = svcId);
+            editarInputs.estado.value = card.getAttribute('data-estado') || 'activo';
+            editarInputs.servicioCount.textContent = (editarInputs.servicio.value||'').length;
+            editarInputs.descripcionCount.textContent = (editarInputs.descripcion.value||'').length;
+            // compute index within grid
+            var grid = card.parentNode; var idx = Array.prototype.indexOf.call(grid.children, card); editarInputs.cardIndex.value = String(idx);
+
+            var imgUrl = card.getAttribute('data-imagen') || '';
+            if(imgUrl){ editarInputs.imagenPreview.style.backgroundImage = 'url("'+imgUrl+'")'; editarInputs.imagenPreview.style.backgroundSize='cover'; editarInputs.imagenPreview.style.backgroundPosition='center'; editarInputs.imagenPreview.textContent=''; editarInputs.clearImgBtn.classList.remove('hidden'); }
+            else { editarInputs.imagenPreview.style.backgroundImage = ''; editarInputs.imagenPreview.textContent = 'Preview'; editarInputs.clearImgBtn.classList.add('hidden'); }
+
+            editarModal.classList.remove('hidden'); editarModal.classList.add('flex'); editarModal.setAttribute('aria-hidden','false');
+            setTimeout(function(){ editarInputs.servicio && editarInputs.servicio.focus(); }, 40);
+        }
+
+        function closeEditarModal(){ if(!editarModal) return; editarModal.classList.remove('flex'); editarModal.classList.add('hidden'); editarModal.setAttribute('aria-hidden','true'); if(editarInputs.imagenFile) editarInputs.imagenFile.value = ''; var alert = document.getElementById('editarModalAlert'); if(alert){ alert.className='hidden'; alert.textContent=''; } }
+
+        function showEditarAlert(type, text){ var el = document.getElementById('editarModalAlert'); if(!el) return; el.className=''; el.classList.add('mb-4','p-3','rounded'); if(type==='error') el.classList.add('bg-red-100','text-red-700'); else el.classList.add('bg-green-100','text-green-700'); el.textContent = text; el.classList.remove('hidden'); }
+
+        qsa('.editar-servicio').forEach(function(btn){ btn.addEventListener('click', function(ev){ ev && ev.preventDefault(); var card = btn.closest('article[data-servicio]'); openEditarModalFromCard(card); }); });
+
+        if(closeEditarBtn) closeEditarBtn.addEventListener('click', closeEditarModal);
+        if(cancelEditarBtn) cancelEditarBtn.addEventListener('click', closeEditarModal);
+        document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(editarModal && !editarModal.classList.contains('hidden')) closeEditarModal(); }});
+
+        // image preview
+        if(editarInputs.imagenFile && editarInputs.imagenPreview){
+            editarInputs.imagenFile.addEventListener('change', function(ev){
+                var f = ev.target.files && ev.target.files[0];
+                var filenameEl = document.getElementById('editarServicioImagenFilename');
+                if(!f){ if(filenameEl) filenameEl.textContent = 'Ningún archivo seleccionado'; editarInputs.imagenPreview.textContent='Previsualizar'; editarInputs.imagenPreview.style.backgroundImage=''; editarInputs.clearImgBtn.classList.add('hidden'); return; }
+                if(filenameEl) filenameEl.textContent = f.name;
+                if(!f.type.startsWith('image/')){ editarInputs.imagenPreview.textContent='No es una imagen'; editarInputs.clearImgBtn.classList.add('hidden'); return; }
+                var r = new FileReader();
+                r.onload = function(){ editarInputs.imagenPreview.style.backgroundImage = 'url("'+r.result+'")'; editarInputs.imagenPreview.style.backgroundSize='cover'; editarInputs.imagenPreview.style.backgroundPosition='center'; editarInputs.imagenPreview.textContent=''; editarInputs.clearImgBtn.classList.remove('hidden'); };
+                r.readAsDataURL(f);
+            });
+        }
+        if(editarInputs.clearImgBtn){ editarInputs.clearImgBtn.addEventListener('click', function(e){ e && e.preventDefault(); if(editarInputs.imagenFile) editarInputs.imagenFile.value = ''; if(editarInputs.imagenPreview){ editarInputs.imagenPreview.style.backgroundImage=''; editarInputs.imagenPreview.textContent='Previsualizar'; } var fn = document.getElementById('editarServicioImagenFilename'); if(fn) fn.textContent = 'Ningún archivo seleccionado'; editarInputs.clearImgBtn.classList.add('hidden'); }); }
+
+        // sanitizers
+        function sanitizeNombreInput(el, counterEl, max){ if(!el) return; var v = el.value || ''; v = v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s\'\-]/g, ''); if(v.length>max) v = v.slice(0,max); if(el.value!==v) el.value = v; if(counterEl) counterEl.textContent = v.length; }
+        function sanitizeDescInput(el, counterEl, max){ if(!el) return; var v = el.value || ''; v = v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s\'\-\n]/g, ''); if(v.length>max) v = v.slice(0,max); if(el.value!==v) el.value = v; if(counterEl) counterEl.textContent = v.length; }
+        function sanitizePrecioInput(el){
+            if(!el) return;
+            var v = el.value || '';
+            v = v.replace(/[^0-9.]/g, '');
+            var parts = v.split('.');
+            if(parts.length>2) v = parts[0] + '.' + parts.slice(1).join('');
+            if(v.indexOf('.')!==-1){
+                var idx = v.indexOf('.');
+                var intPart = v.slice(0, idx);
+                var decPart = v.slice(idx+1).slice(0,2);
+                // limit integer part to max 3 digits
+                if(intPart.length > 3) intPart = intPart.slice(0,3);
+                v = intPart + (decPart?'.'+decPart:'');
+            } else {
+                // no decimal — ensure integer part max 3 digits
+                if(v.length > 3) v = v.slice(0,3);
+            }
+            if(el.value!==v) el.value = v;
+        }
+
+        if(editarInputs.servicio){ editarInputs.servicio.addEventListener('input', function(){ sanitizeNombreInput(editarInputs.servicio, editarInputs.servicioCount, 50); }); }
+        if(editarInputs.descripcion){ editarInputs.descripcion.addEventListener('input', function(){ sanitizeDescInput(editarInputs.descripcion, editarInputs.descripcionCount, 100); }); }
+        if(editarInputs.precio){ editarInputs.precio.addEventListener('input', function(){ sanitizePrecioInput(editarInputs.precio); }); }
+
+        if(editarForm){
+            // function that actually applies the edit to the card (used after confirmation)
+            function doEdit(){
+                var payload = { servicio: editarInputs.servicio.value, categoria: editarInputs.categoria.value, descripcion: editarInputs.descripcion.value, precio: editarInputs.precio.value, estado: editarInputs.estado.value };
+                var svcId = (editarInputs.cardId && editarInputs.cardId.value) || '';
+                if(!svcId){ showEditarAlert('error','ID de servicio no disponible.'); return; }
+
+                // build FormData to support optional image
+                var fd = new FormData();
+                fd.append('servicio', payload.servicio || '');
+                fd.append('categoria', payload.categoria || '');
+                fd.append('descripcion', payload.descripcion || '');
+                fd.append('precio', payload.precio || '');
+                fd.append('estado', payload.estado || '');
+                var f = editarInputs.imagenFile && editarInputs.imagenFile.files && editarInputs.imagenFile.files[0];
+                if(f) fd.append('imagen', f);
+
+                // send to server
+                var saveBtnLocal = document.getElementById('saveEditarBtn');
+                if(saveBtnLocal) saveBtnLocal.disabled = true;
+                showEditarAlert('success','Guardando cambios...');
+
+                fetch('/api/servicios/' + encodeURIComponent(svcId), { method: 'PUT', body: fd })
+                    .then(function(resp){ return resp.json().then(function(j){ return { ok: resp.ok, status: resp.status, json: j }; }); })
+                    .then(function(res){
+                        if(!res.ok || !res.json || !res.json.ok){ var err = (res.json && res.json.error) ? res.json.error : 'Error guardando servicio'; showEditarAlert('error', err); if(saveBtnLocal) saveBtnLocal.disabled = false; return; }
+
+                        // success: update card DOM using returned data if available
+                        var updated = res.json.data || payload;
+                        var container = document.querySelector('section[aria-labelledby="servicesHeading"] > div');
+                        var cards = container ? container.querySelectorAll('article[data-servicio]') : [];
+                        // find card by data-id
+                        var card = null;
+                        for(var i=0;i<cards.length;i++){ if(cards[i].getAttribute('data-id') === svcId){ card = cards[i]; break; } }
+                        if(card){
+                            card.setAttribute('data-servicio', updated.servicio || payload.servicio);
+                            // store category id and human name on the card
+                            var catIdToSet = (updated.categoriaId || updated.categoria || payload.categoria) || '';
+                            var catNameToSet = (updated.categoriaNombre || updated.categoriaNombre === '') ? updated.categoriaNombre : (payload.categoriaNombre || null);
+                            card.setAttribute('data-categoria', catIdToSet);
+                            if(catNameToSet) card.setAttribute('data-categoria-nombre', catNameToSet);
+                            else card.removeAttribute('data-categoria-nombre');
+                            card.setAttribute('data-descripcion', updated.descripcion || payload.descripcion);
+                            card.setAttribute('data-precio', (typeof updated.precio !== 'undefined')? String(updated.precio): payload.precio);
+                            // keep estado in sync so edit modal reads the correct value
+                            card.setAttribute('data-estado', (typeof updated.estado !== 'undefined' && updated.estado !== null) ? String(updated.estado) : (payload.estado || 'activo'));
+                            if(updated.imagen){ card.setAttribute('data-imagen', updated.imagen); var imgWrap = card.querySelector('.relative.w-full.h-40'); if(imgWrap){ imgWrap.innerHTML = '<img src="'+updated.imagen+'" alt="'+(updated.servicio||payload.servicio)+'" class="object-cover w-full h-full" />'; } }
+                            var title = card.querySelector('h3'); if(title) title.textContent = updated.servicio || payload.servicio;
+                            var desc = card.querySelector('p'); if(desc) desc.textContent = updated.descripcion || payload.descripcion;
+                            var catEl = card.querySelector('.mt-2 .text-sm');
+                            var displayCat = (updated.categoriaNombre) ? updated.categoriaNombre : (payload.categoriaNombre || null);
+                            if(!displayCat){
+                                // fallback to any id or string available
+                                displayCat = (updated.categoria || updated.categoriaId) || payload.categoria || 'Servicio';
+                            }
+                            if(catEl) catEl.textContent = displayCat;
+                            var priceEl = card.querySelector('.mt-2 .text-lg'); if(priceEl) priceEl.textContent = (typeof updated.precio !== 'undefined' && updated.precio !== null) ? ('$'+updated.precio) : (payload.precio?('$'+payload.precio):'--');
+                        }
+
+                        showEditarAlert('success','Cambios guardados.');
+                        setTimeout(function(){ closeEditarModal(); if(saveBtnLocal) saveBtnLocal.disabled = false; }, 700);
+                    })
+                    .catch(function(err){ showEditarAlert('error', err && err.message ? err.message : 'Error de red'); if(saveBtnLocal) saveBtnLocal.disabled = false; });
+            }
+
+            // show confirmation first
+            editarForm.addEventListener('submit', function(e){
+                e && e.preventDefault();
+                var payload = { servicio: editarInputs.servicio.value, categoria: editarInputs.categoria.value, descripcion: editarInputs.descripcion.value, precio: editarInputs.precio.value, estado: editarInputs.estado.value };
+                if(!payload.servicio || !payload.servicio.trim()){ showEditarAlert('error','El nombre del servicio es requerido.'); return; }
+                if(payload.servicio.trim().length>50){ showEditarAlert('error','El nombre no puede tener más de 50 caracteres.'); return; }
+                if(!payload.categoria || !payload.categoria.trim()){ showEditarAlert('error','La categoría es requerida.'); return; }
+                if(!payload.estado || !payload.estado.trim()){ showEditarAlert('error','El estado es requerido.'); return; }
+                var precioRe = /^\d{1,3}(?:\.\d{1,2})?$/; if(!precioRe.test(String(payload.precio||''))){ showEditarAlert('error','Precio inválido. Use hasta 2 decimales.'); return; }
+
+                var confirmArea = document.getElementById('editarConfirm');
+                var confirmText = document.getElementById('editarConfirmText');
+                var confirmBtn = document.getElementById('editarConfirmBtn');
+                var cancelBtn = document.getElementById('editarCancelConfirmBtn');
+                if(confirmArea && confirmText){
+                    confirmText.textContent = '¿Guardar cambios en "' + (payload.servicio || '') + '"?';
+                    confirmArea.classList.remove('hidden');
+                }
+
+                // wire confirm and cancel
+                if(confirmBtn) confirmBtn.onclick = function(){
+                    // hide confirm and perform edit
+                    if(confirmArea) confirmArea.classList.add('hidden');
+                    doEdit();
+                };
+                if(cancelBtn) cancelBtn.onclick = function(){ if(confirmArea) confirmArea.classList.add('hidden'); };
+            });
+        }
+
+    })();
+</script>
+
+<!-- Delete Service confirm modal (diseño-only) -->
+<div id="deleteServicioModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4">
+        <div class="flex items-center justify-between px-6 py-4 border-b">
+            <h2 class="text-lg font-semibold">Confirmar eliminación</h2>
+            <button type="button" id="closeDeleteServicioModalBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p class="text-lg font-medium text-gray-700 mb-4">Estás por eliminar el servicio:</p>
+            <div class="mb-4 p-3 rounded bg-gray-50 border text-gray-800">
+                <div id="deleteServicioName" class="font-medium"></div>
+                <div id="deleteServicioPrecio" class="text-sm text-gray-600"></div>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelDeleteServicioBtn" aria-label="Cancelar eliminación" class="px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    <button type="button" id="confirmDeleteServicioBtn" aria-label="Confirmar eliminación" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var modal = document.getElementById('deleteServicioModal');
+        var closeBtn = document.getElementById('closeDeleteServicioModalBtn');
+        var cancelBtn = document.getElementById('cancelDeleteServicioBtn');
+        var confirmBtn = document.getElementById('confirmDeleteServicioBtn');
+        var nameEl = document.getElementById('deleteServicioName');
+        var priceEl = document.getElementById('deleteServicioPrecio');
+
+        var pendingDeleteId = null;
+
+        function openModal(name, price, id){
+            if(!modal) return;
+            nameEl && (nameEl.textContent = name || '-');
+            priceEl && (priceEl.textContent = price ? ('$'+price) : '');
+            pendingDeleteId = id || null;
+            modal.classList.remove('hidden'); modal.classList.add('flex'); modal.setAttribute('aria-hidden','false');
+            setTimeout(function(){ confirmBtn && confirmBtn.focus(); }, 40);
+        }
+
+        function closeModal(){ if(!modal) return; modal.classList.remove('flex'); modal.classList.add('hidden'); modal.setAttribute('aria-hidden','true'); pendingDeleteId = null; }
+
+        // Delegate clicks from delete buttons in cards
+        document.addEventListener('click', function(e){
+            var btn = e.target.closest && e.target.closest('.delete-servicio-btn');
+            if(!btn) return;
+            e.preventDefault();
+            var card = btn.closest && btn.closest('article[data-servicio]');
+            if(!card) return openModal();
+            var name = card.getAttribute('data-servicio') || '';
+            var price = card.getAttribute('data-precio') || '';
+            var id = card.getAttribute('data-id') || null;
+            openModal(name, price, id);
+        });
+
+        if(closeBtn) closeBtn.addEventListener('click', closeModal);
+        if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+        if(confirmBtn) confirmBtn.addEventListener('click', function(){
+            if(!pendingDeleteId){ closeModal(); return; }
+
+            // Disable confirm button while deleting
+            confirmBtn.disabled = true;
+            var originalText = confirmBtn.textContent;
+            confirmBtn.textContent = 'Eliminando...';
+
+            fetch('/api/servicios/' + encodeURIComponent(pendingDeleteId), { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
+                .then(function(res){ return res.json().then(function(j){ return { ok: res.ok, status: res.status, body: j }; }); })
+                .then(function(r){
+                    if(!r.ok || !r.body || !r.body.ok){
+                        var err = (r.body && r.body.error) ? r.body.error : 'Error al eliminar servicio';
+                        // Show inline alert inside modal
+                        var alertEl = modal.querySelector('.modal-error-msg');
+                        if(!alertEl){ alertEl = document.createElement('div'); alertEl.className = 'modal-error-msg mb-4 p-3 rounded bg-red-100 text-red-700'; alertEl.style.marginBottom = '0.75rem'; modal.querySelector('.p-6').insertBefore(alertEl, modal.querySelector('.p-6').firstChild); }
+                        alertEl.textContent = err;
+                        confirmBtn.disabled = false; confirmBtn.textContent = originalText;
+                        return;
+                    }
+
+                    // success: remove the card from DOM
+                    try{
+                        var selector = 'article[data-id="' + pendingDeleteId.replace(/"/g,'\"') + '"]';
+                        var card = document.querySelector(selector);
+                        if(card && card.parentNode){ card.parentNode.removeChild(card); }
+                    }catch(e){ console.warn('Could not remove service card', e); }
+
+                    // Optionally show a page alert modal if available
+                    var pageAlertModal = document.getElementById('pageAlertModal');
+                    if(pageAlertModal){
+                        var alertMsg = document.getElementById('pageAlertMessage');
+                        var alertTitle = document.getElementById('pageAlertTitle');
+                        if(alertMsg) alertMsg.textContent = 'Servicio eliminado con éxito.';
+                        if(alertTitle) alertTitle.textContent = 'Éxito';
+                        pageAlertModal.classList.remove('hidden'); pageAlertModal.classList.add('flex'); pageAlertModal.setAttribute('aria-hidden','false');
+                        // auto-close after 3s
+                        setTimeout(function(){ pageAlertModal.classList.remove('flex'); pageAlertModal.classList.add('hidden'); pageAlertModal.setAttribute('aria-hidden','true'); }, 3000);
+                    }
+
+                    closeModal();
+                })
+                .catch(function(err){
+                    console.error('Delete error', err);
+                    var alertEl = modal.querySelector('.modal-error-msg');
+                    if(!alertEl){ alertEl = document.createElement('div'); alertEl.className = 'modal-error-msg mb-4 p-3 rounded bg-red-100 text-red-700'; modal.querySelector('.p-6').insertBefore(alertEl, modal.querySelector('.p-6').firstChild); }
+                    alertEl.textContent = 'Error de red al eliminar servicio';
+                })
+                .finally(function(){ confirmBtn.disabled = false; confirmBtn.textContent = originalText; pendingDeleteId = null; });
+        });
+
+        // close on ESC
+        document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(modal && !modal.classList.contains('hidden')) closeModal(); }});
+    })();
+</script>
+
+<!-- Success modal for admin feedback (reused from usuarios.hbs) -->
+<div id="pageAlertModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+        <div class="flex items-start justify-between px-6 py-4 border-b">
+            <h2 id="pageAlertTitle" class="text-lg font-semibold">Operación</h2>
+            <button type="button" id="closePageAlertBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p id="pageAlertMessage" class="text-sm text-gray-800">Mensaje</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var alertModal = document.getElementById('pageAlertModal');
+        var closeAlertBtn = document.getElementById('closePageAlertBtn');
+        if(closeAlertBtn){
+            closeAlertBtn.addEventListener('click', function(){ if(alertModal){ alertModal.classList.remove('flex'); alertModal.classList.add('hidden'); alertModal.setAttribute('aria-hidden','true'); } });
+        }
+    })();
+</script>

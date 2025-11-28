@@ -1,0 +1,561 @@
+<div class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
+    <style>
+        /* Main content text in brown for consistency with admin dashboard */
+        .main-text-brown, .main-text-brown * { color: #5A3E2A !important; }
+        /* Respect existing white text utilities when explicitly used */
+        .main-text-brown .text-white, .main-text-brown .text-white * { color: #ffffff !important; }
+        /* Button styles for edit/delete actions to match Servicios view */
+        .main-text-brown .editar-servicio, .main-text-brown .editar-servicio * { color: #6B4F2B !important; }
+        .main-text-brown .delete-servicio-btn, .main-text-brown .delete-servicio-btn * { color: #DC2626 !important; }
+        .main-text-brown button[aria-label="Editar categoría"] i, .main-text-brown button[aria-label="Editar categoría"] * { color: #6B4F2B !important; }
+        .main-text-brown button[aria-label="Eliminar categoría"] i, .main-text-brown button[aria-label="Eliminar categoría"] * { color: #DC2626 !important; }
+    </style>
+    <div class="flex h-screen">
+        {{> admin_sidebar sections=sections active=active user=user}}
+
+        <main class="flex-1 p-6 flex flex-col min-h-0 overflow-auto main-text-brown">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-0">
+                    <i class="fa-solid fa-tags mr-2" aria-hidden="true"></i>
+                    <h1 class="text-2xl font-bold">Categorías</h1>
+                </div>
+                <a href="#" id="openNewCategory" class="inline-flex items-center gap-2 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#efe3cc] focus:outline-none focus:ring-2 focus:ring-[#E0D5C5]" aria-label="Nueva Categoría">
+                    <i class="fa-solid fa-plus h-5 w-5 text-[#6B4F2B]" aria-hidden="true"></i>
+                    <span class="font-medium text-sm text-[#6B4F2B]">Nueva Categoría</span>
+                </a>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 w-full md:w-1/2">
+                    <label for="categorySearch" class="sr-only">Buscar categorías</label>
+                    <i class="fa-solid fa-magnifying-glass text-gray-500 pl-2" aria-hidden="true"></i>
+                    <input id="categorySearch" type="search" placeholder="Buscar por nombre" class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Buscar categorías" />
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="stateFilter" class="text-sm font-medium text-gray-700 inline-flex items-center">
+                        <i class="fa-solid fa-filter mr-2 text-gray-600" aria-hidden="true"></i>
+                        Filtrar por estado:
+                    </label>
+                    <select id="stateFilter" class="appearance-none rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Filtrar por estado">
+                        <option value="all">Todos</option>
+                        <option value="active">Activos</option>
+                        <option value="inactive">Inactivos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Listado -->
+            <section aria-labelledby="categoriesHeading" class="mb-8 overflow-auto flex-1">
+                <h2 id="categoriesHeading" class="sr-only">Listado de categorías</h2>
+
+                {{#if error}}
+                    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">{{error}}</div>
+                {{/if}}
+
+                        <div class="bg-white p-4 rounded shadow max-w-4xl mx-auto">
+                            <div class="overflow-x-auto">
+                                <table class="w-full table-fixed text-left text-sm">
+                                    <thead class="text-gray-600 uppercase text-xs border-b">
+                                        <tr>
+                                            <th class="px-4 py-3 w-1/2"><i class="fa-solid fa-tag mr-2 text-gray-600" aria-hidden="true"></i>Nombre</th>
+                                            <th class="px-4 py-3 w-1/6"><i class="fa-solid fa-circle-check mr-2 text-gray-600" aria-hidden="true"></i>Estado</th>
+                                            <th class="px-4 py-3 w-1/3"><i class="fa-solid fa-ellipsis-vertical mr-2 text-gray-600" aria-hidden="true"></i>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y">
+                                        {{#each categories}}
+                                        <tr data-name="{{this.name}}" data-active="{{this.active}}" data-id="{{this.id}}">
+                                            <td class="px-4 py-3 align-middle">
+                                                <div class="font-medium truncate max-w-full">{{this.name}}</div>
+                                            </td>
+                                            <td class="px-4 py-3 align-middle">
+                                                {{#if this.active}}
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Activo</span>
+                                                {{else}}
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">Inactivo</span>
+                                                {{/if}}
+                                            </td>
+                                            <td class="px-4 py-3 align-middle text-right">
+                                                <div class="flex items-center gap-3 justify-end items-center">
+                                                    <button type="button" class="edit-category editar-servicio px-3 py-2 rounded-md bg-[#F5EBDD] border border-[#E0D5C5] hover:bg-[#efe3cc] text-[#6B4F2B] text-sm font-medium" data-id="{{this.id}}" aria-label="Editar categoría"><i class="fa-solid fa-pen-to-square mr-2" aria-hidden="true"></i>Editar</button>
+                                                    <button type="button" class="delete-category delete-servicio-btn px-3 py-2 rounded-md border border-red-100 bg-white text-red-600 hover:bg-red-50 text-sm font-medium" data-id="{{this.id}}" data-name="{{this.name}}" aria-label="Eliminar categoría"><i class="fa-solid fa-trash mr-2" aria-hidden="true"></i>Eliminar</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {{/each}}
+
+                                        {{#unless categories.length}}
+                                        <tr>
+                                            <td colspan="3" class="px-4 py-8 text-center text-gray-500">no hay categorias todavia</td>
+                                        </tr>
+                                        {{/unless}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+            </section>
+
+            <!-- Pagination removed per design preference -->
+
+            <!-- Modal: Nueva / Editar Categoría -->
+            <div id="categoriaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 overflow-auto">
+                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                        <h2 id="categoriaModalTitle" class="text-lg font-semibold">Nueva Categoría</h2>
+                        <button type="button" id="closeCategoriaModal" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <form id="categoriaForm">
+                            <div id="categoriaModalAlert" class="hidden mb-4"></div>
+
+                            <!-- Confirmation area (hidden until creating a new category) -->
+                            <div id="categoriaConfirm" class="hidden mb-4 p-4 rounded bg-yellow-50 border border-yellow-100">
+                                <p id="categoriaConfirmText" class="text-sm text-gray-800 mb-4">¿Crear nueva categoría?</p>
+                                <div class="flex justify-end gap-3">
+                                    <button type="button" id="cancelCategoriaConfirmBtn" class="px-4 py-2 rounded-md border">Cancelar</button>
+                                    <button type="button" id="confirmCategoriaCreateBtn" class="px-4 py-2 rounded-md bg-[#6B4F2B] text-white">Confirmar</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-700 mb-1"><i class="fa-solid fa-tag mr-2 text-gray-500" aria-hidden="true"></i>Nombre</label>
+                                    <input id="cat_nombre" name="name" class="w-full border border-gray-200 rounded-md px-3 py-2" minlength="2" maxlength="50" aria-describedby="cat_nombre_help" />
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex items-center gap-4">
+                                <label class="flex items-center gap-3">
+                                    <div class="relative">
+                                        <input type="checkbox" id="cat_active" name="active" class="sr-only peer" checked aria-hidden="false" />
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-[#6B4F2B] transition-colors"></div>
+                                        <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
+                                    </div>
+                                    <span class="text-sm text-gray-700"><i class="fa-solid fa-check mr-1 text-gray-500" aria-hidden="true"></i>Activo</span>
+                                </label>
+                            </div>
+
+                            <input type="hidden" id="cat_id" name="id" value="" />
+
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" id="cancelCategoriaBtn" class="px-4 py-2 rounded-md border"><i class="fa-solid fa-xmark mr-2" aria-hidden="true"></i>Cancelar</button>
+                                <button type="submit" id="saveCategoriaBtn" class="px-4 py-2 rounded-md bg-[#6B4F2B] text-white"><i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i>Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirm delete modal -->
+            <div id="confirmDeleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4">
+                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                        <h2 class="text-lg font-semibold">Confirmar eliminación</h2>
+                        <button type="button" id="closeDeleteModal" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-lg font-medium text-gray-700 mb-4">Estás por eliminar la categoría:</p>
+                            <div class="mb-4 p-3 rounded bg-gray-50 border text-gray-800" id="deleteCategoryInfo">-</div>
+                            <div id="deleteModalAlert" class="hidden mb-4"></div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" id="cancelDeleteBtn" class="px-4 py-2 rounded-md border">Cancelar</button>
+                            <button type="button" id="confirmDeleteBtn" class="px-4 py-2 rounded-md bg-red-600 text-white"><i class="fa-solid fa-trash mr-2" aria-hidden="true"></i>Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // Modal open/close for new category
+        var openNew = document.getElementById('openNewCategory');
+        var modal = document.getElementById('categoriaModal');
+        var closeModal = document.getElementById('closeCategoriaModal');
+        var cancelBtn = document.getElementById('cancelCategoriaBtn');
+        var form = document.getElementById('categoriaForm');
+        var saveBtn = document.getElementById('saveCategoriaBtn');
+
+        function openCreate(e){ e && e.preventDefault(); if(!modal) return; document.getElementById('categoriaModalTitle').textContent = 'Nueva Categoría'; document.getElementById('cat_id').value = ''; form.reset(); var ca = document.getElementById('categoriaConfirm'); if(ca) ca.classList.add('hidden'); modal.classList.remove('hidden'); modal.classList.add('flex'); setTimeout(function(){ document.getElementById('cat_nombre') && document.getElementById('cat_nombre').focus(); },50); }
+        function closeCreate(e){ e && e.preventDefault(); if(!modal) return; modal.classList.remove('flex'); modal.classList.add('hidden'); }
+
+        openNew && openNew.addEventListener('click', openCreate);
+        closeModal && closeModal.addEventListener('click', closeCreate);
+        cancelBtn && cancelBtn.addEventListener('click', closeCreate);
+
+        // --- Validation: allow only letters (including accents and ñ), spaces, commas and periods ---
+        // This will sanitize input on typing and on paste for relevant fields
+        var lettersRegex = /[^A-Za-zÀ-ÖØ-öø-ÿñÑ\s,\.]/g;
+
+        // Generic helper to show an alert element and auto-hide after a delay (ms)
+        function showAutoHideAlert(el, type, text, ms){
+            if(!el) return;
+            // clear previous timeout if any
+            try{ if(el._autoHideTimeout){ clearTimeout(el._autoHideTimeout); el._autoHideTimeout = null; } }catch(e){}
+            el.className = '';
+            el.classList.add('mb-4','p-3','rounded');
+            if(type === 'error') { el.classList.add('bg-red-100','text-red-700'); }
+            else if(type === 'success') { el.classList.add('bg-green-100','text-green-700'); }
+            else { el.classList.add('bg-yellow-100','text-yellow-700'); }
+            el.textContent = text;
+            el.classList.remove('hidden');
+            var delay = (typeof ms === 'number') ? ms : 5000;
+            // auto-hide after delay
+            el._autoHideTimeout = setTimeout(function(){ try{ el.classList.add('hidden'); el._autoHideTimeout = null; }catch(e){} }, delay);
+        }
+        function sanitizeInputEvent(e){
+            try{
+                var el = e.target;
+                if(!el) return;
+                var old = el.value || '';
+                var cleaned = old.replace(lettersRegex, '');
+                // Enforce maxlength if present on the element
+                var max = (typeof el.maxLength === 'number') ? el.maxLength : -1;
+                if(max > 0 && cleaned.length > max){
+                    cleaned = cleaned.slice(0, max);
+                }
+                if(old !== cleaned){
+                    var start = el.selectionStart || 0;
+                    var diff = old.length - cleaned.length;
+                    el.value = cleaned;
+                    var pos = start - diff;
+                    if(pos < 0) pos = 0;
+                    try{ el.setSelectionRange(pos, pos); }catch(err){}
+                }
+            }catch(err){}
+        }
+
+        function sanitizePasteEvent(e){
+            try{
+                e.preventDefault();
+                var text = (e.clipboardData || window.clipboardData).getData('text') || '';
+                text = text.replace(lettersRegex, '');
+                // respect maxlength available space when pasting
+                var el = e.target;
+                var max = (typeof el.maxLength === 'number') ? el.maxLength : -1;
+                var start = el.selectionStart || 0;
+                var end = el.selectionEnd || 0;
+                var currentLen = (el.value || '').length;
+                if(max > 0){
+                    var available = Math.max(0, max - (currentLen - (end - start)));
+                    if(text.length > available) text = text.slice(0, available);
+                }
+                // use execCommand fallback for older browsers
+                if(document.queryCommandSupported && document.queryCommandSupported('insertText')){
+                    document.execCommand('insertText', false, text);
+                } else {
+                    var value = el.value || '';
+                    el.value = value.slice(0, start) + text + value.slice(end);
+                    var pos = start + text.length;
+                    try{ el.setSelectionRange(pos, pos); }catch(err){}
+                }
+            }catch(err){}
+        }
+
+        // Attach listeners if elements exist
+        var _nameEl = document.getElementById('cat_nombre');
+        var _searchEl = document.getElementById('categorySearch');
+        if(_nameEl){ _nameEl.addEventListener('input', sanitizeInputEvent); _nameEl.addEventListener('paste', sanitizePasteEvent); }
+        if(_searchEl){ _searchEl.addEventListener('input', sanitizeInputEvent); _searchEl.addEventListener('paste', sanitizePasteEvent); }
+        // ----------------------------------------------------------------------
+
+        // Edit buttons: delegate
+        document.addEventListener('click', function(e){
+            var el = e.target.closest && e.target.closest('.edit-category');
+            if(!el) return;
+            e.preventDefault();
+            var id = el.getAttribute('data-id');
+            // try to find row data
+            var row = el.closest('tr');
+            if(!row) return;
+            var name = row.getAttribute('data-name') || '';
+            var active = row.getAttribute('data-active') === 'true';
+            document.getElementById('categoriaModalTitle').textContent = 'Editar Categoría';
+            document.getElementById('cat_id').value = id || '';
+            document.getElementById('cat_nombre').value = name || '';
+            document.getElementById('cat_active').checked = !!active;
+            var ca = document.getElementById('categoriaConfirm'); if(ca) ca.classList.add('hidden');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(function(){ document.getElementById('cat_nombre') && document.getElementById('cat_nombre').focus(); },50);
+        });
+
+        // Delete delegation
+        var deleteModal = document.getElementById('confirmDeleteModal');
+        var closeDelete = document.getElementById('closeDeleteModal');
+        var cancelDelete = document.getElementById('cancelDeleteBtn');
+        var confirmDelete = document.getElementById('confirmDeleteBtn');
+        var deleteInfo = document.getElementById('deleteCategoryInfo');
+        var pendingDeleteId = null;
+
+        document.addEventListener('click', function(e){
+            var el = e.target.closest && e.target.closest('.delete-category');
+            if(!el) return;
+            e.preventDefault();
+            var id = el.getAttribute('data-id');
+            var name = el.getAttribute('data-name') || '';
+            pendingDeleteId = id;
+            if(deleteInfo) deleteInfo.textContent = name;
+            if(deleteModal){ deleteModal.classList.remove('hidden'); deleteModal.classList.add('flex'); }
+        });
+
+        function closeDel(){ if(deleteModal){ deleteModal.classList.remove('flex'); deleteModal.classList.add('hidden'); } pendingDeleteId = null; }
+        closeDelete && closeDelete.addEventListener('click', closeDel);
+        cancelDelete && cancelDelete.addEventListener('click', closeDel);
+
+        // Confirm delete: call API to remove from server, fallback removes row locally
+        confirmDelete && confirmDelete.addEventListener('click', function(){
+            if(!pendingDeleteId) return closeDel();
+            var alertEl = document.getElementById('deleteModalAlert');
+            var origHtml = confirmDelete.innerHTML;
+            confirmDelete.disabled = true;
+            confirmDelete.innerHTML = 'Eliminando...';
+
+            function showDeleteAlert(text){
+                if(!alertEl) return window.alert(text);
+                showAutoHideAlert(alertEl, 'error', text, 5000);
+            }
+
+            // try server delete
+            if(window.fetch){
+                fetch('/api/categorias/' + encodeURIComponent(pendingDeleteId), { method: 'DELETE' })
+                .then(function(res){ return res.json().then(function(body){ return { ok: res.ok, status: res.status, body: body }; }); })
+                .then(function(r){
+                    if(r && r.ok && r.body && r.body.ok){
+                        var row = document.querySelector('tr[data-id="' + pendingDeleteId + '"]');
+                        if(row && row.parentNode) row.parentNode.removeChild(row);
+                        // restore state and close
+                        confirmDelete.disabled = false; confirmDelete.innerHTML = origHtml;
+                        closeDel();
+                    } else {
+                        var msg = (r && r.body && r.body.error) ? r.body.error : 'Error eliminando categoría';
+                        showDeleteAlert(msg);
+                        confirmDelete.disabled = false; confirmDelete.innerHTML = origHtml;
+                    }
+                }).catch(function(err){
+                    showDeleteAlert('Error de red al eliminar categoría');
+                    confirmDelete.disabled = false; confirmDelete.innerHTML = origHtml;
+                });
+                return;
+            }
+
+            // Fallback: remove from DOM only
+            var row = document.querySelector('tr[data-id="' + pendingDeleteId + '"]');
+            if(row && row.parentNode) row.parentNode.removeChild(row);
+            confirmDelete.disabled = false; confirmDelete.innerHTML = origHtml;
+            closeDel();
+        });
+
+        // Simple client-side search + filter (debounced)
+        var searchEl = document.getElementById('categorySearch');
+        var stateEl = document.getElementById('stateFilter');
+        var tbody = document.querySelector('table tbody');
+
+        function normalize(s){ return (s||'').toString().toLowerCase().trim(); }
+        function applyFilter(){
+            if(!tbody) return;
+            var q = normalize(searchEl && searchEl.value);
+            var state = stateEl ? stateEl.value : 'all';
+            var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+            rows.forEach(function(r){
+                var name = normalize(r.getAttribute('data-name'));
+                var active = (r.getAttribute('data-active') === 'true');
+                var matchesQ = !q || name.indexOf(q) !== -1;
+                var matchesState = (state === 'all') || (state === 'active' && active) || (state === 'inactive' && !active);
+                if(matchesQ && matchesState) r.style.display = '';
+                else r.style.display = 'none';
+            });
+        }
+        function debounce(fn, wait){ var t; return function(){ var args = arguments; clearTimeout(t); t = setTimeout(function(){ fn.apply(null, args); }, wait); }; }
+        if(searchEl) searchEl.addEventListener('input', debounce(applyFilter, 180));
+        if(stateEl) stateEl.addEventListener('change', applyFilter);
+
+        // Prevent actual form submit (UI-only). Could be wired to /api/categorias later.
+        form && form.addEventListener('submit', function(e){
+            e.preventDefault();
+            var id = document.getElementById('cat_id').value;
+            var name = (document.getElementById('cat_nombre').value || '').trim();
+            var active = document.getElementById('cat_active').checked;
+
+            // Modal-level alert element
+            var modalAlertEl = document.getElementById('categoriaModalAlert');
+            function showModalAlert(type, text){
+                if(!modalAlertEl) return window.alert(text);
+                showAutoHideAlert(modalAlertEl, type, text, 5000);
+            }
+
+            // Validate: name required and must contain only letters/spaces (including accents and ñ)
+            var nameValidPattern = /^[A-Za-zÀ-ÖØ-öø-ÿñÑ\s,\.]+$/;
+            var nameMin = 2, nameMax = 50;
+            var descMin = 5, descMax = 300;
+            if(!name){ showModalAlert('error','El nombre es obligatorio.'); document.getElementById('cat_nombre').focus(); return; }
+            if(name.length < nameMin || name.length > nameMax){ showModalAlert('error','El nombre debe tener entre ' + nameMin + ' y ' + nameMax + ' caracteres.'); document.getElementById('cat_nombre').focus(); return; }
+            if(!nameValidPattern.test(name)){
+                showModalAlert('error','El nombre solo puede contener letras y espacios.');
+                document.getElementById('cat_nombre').focus();
+                return;
+            }
+
+            var confirmArea = document.getElementById('categoriaConfirm');
+            var confirmText = document.getElementById('categoriaConfirmText');
+            var confirmBtn = document.getElementById('confirmCategoriaCreateBtn');
+            var cancelConfirmBtn = document.getElementById('cancelCategoriaConfirmBtn');
+
+            function doCreate(){
+                var tb = document.querySelector('table tbody');
+                var alertEl = document.getElementById('categoriaModalAlert');
+                function showAlert(type, text){
+                    if(!alertEl) return;
+                    showAutoHideAlert(alertEl, type, text, 5000);
+                }
+
+                // Try server call first
+                if(window.fetch && tb){
+                    if(confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Creando...'; }
+                    fetch('/api/categorias', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: name, active: !!active })
+                    }).then(function(res){
+                        return res.json().then(function(body){ return { ok: res.ok, status: res.status, body: body }; });
+                    }).then(function(r){
+                            if(r && r.ok && r.body && r.body.ok){
+                            var returnedId = r.body.id || ('tmp-' + Date.now());
+                            var tr = document.createElement('tr');
+                            tr.setAttribute('data-id', returnedId);
+                            tr.setAttribute('data-name', name);
+                            tr.setAttribute('data-active', active);
+                            tr.innerHTML = '<td class="px-4 py-3 align-middle"><div class="font-medium truncate max-w-full">' + name + '</div></td>' +
+                                '<td class="px-4 py-3 align-middle">' + (active ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Activo</span>' : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">Inactivo</span>') + '</td>' +
+                                '<td class="px-4 py-3 align-middle text-right"><div class="flex items-center gap-3 justify-end items-center">' +
+                                '<button type="button" class="edit-category editar-servicio px-3 py-2 rounded-md bg-[#F5EBDD] border border-[#E0D5C5] hover:bg-[#efe3cc] text-[#6B4F2B] text-sm font-medium" data-id="' + returnedId + '"><i class="fa-solid fa-pen-to-square mr-2" aria-hidden="true"></i>Editar</button>' +
+                                '<button type="button" class="delete-category delete-servicio-btn px-3 py-2 rounded-md border border-red-100 bg-white text-red-600 hover:bg-red-50 text-sm font-medium" data-id="' + returnedId + '" data-name="' + name + '"><i class="fa-solid fa-trash mr-2" aria-hidden="true"></i>Eliminar</button></div></td>';
+                            tb.insertBefore(tr, tb.firstChild);
+                            if(confirmArea) confirmArea.classList.add('hidden');
+                            if(confirmBtn) confirmBtn.onclick = null;
+                            if(cancelConfirmBtn) cancelConfirmBtn.onclick = null;
+                            closeCreate();
+                        } else {
+                            var msg = (r && r.body && r.body.error) ? r.body.error : 'Error creando categoría';
+                            showAlert('error', msg);
+                            if(confirmArea) confirmArea.classList.remove('hidden');
+                        }
+                    }).catch(function(err){
+                        showAlert('error','Error de red al crear categoría');
+                        if(confirmArea) confirmArea.classList.remove('hidden');
+                    }).finally(function(){ if(confirmBtn){ confirmBtn.disabled = false; confirmBtn.textContent = 'Confirmar'; } });
+                    return;
+                }
+
+                // Fallback: local-only insertion
+                if(tb){
+                    var newId = 'tmp-' + Date.now();
+                    var tr = document.createElement('tr');
+                    tr.setAttribute('data-id', newId);
+                    tr.setAttribute('data-name', name);
+                    tr.setAttribute('data-active', active);
+                    tr.innerHTML = '<td class="px-4 py-3 align-middle"><div class="font-medium truncate max-w-full">' + name + '</div></td>' +
+                                   '<td class="px-4 py-3 align-middle">' + (active ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Activo</span>' : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">Inactivo</span>') + '</td>' +
+                                   '<td class="px-4 py-3 align-middle text-right"><div class="flex items-center gap-3 justify-end items-center">' +
+                                   '<button type="button" class="edit-category editar-servicio px-3 py-2 rounded-md bg-[#F5EBDD] border border-[#E0D5C5] hover:bg-[#efe3cc] text-[#6B4F2B] text-sm font-medium" data-id="' + newId + '"><i class="fa-solid fa-pen-to-square mr-2" aria-hidden="true"></i>Editar</button>' +
+                                   '<button type="button" class="delete-category delete-servicio-btn px-3 py-2 rounded-md border border-red-100 bg-white text-red-600 hover:bg-red-50 text-sm font-medium" data-id="' + newId + '" data-name="' + name + '"><i class="fa-solid fa-trash mr-2" aria-hidden="true"></i>Eliminar</button></div></td>';
+                    tb.insertBefore(tr, tb.firstChild);
+                }
+                if(confirmArea) confirmArea.classList.add('hidden');
+                if(confirmBtn) confirmBtn.onclick = null;
+                if(cancelConfirmBtn) cancelConfirmBtn.onclick = null;
+                closeCreate();
+            }
+
+            if(id){ // update existing row: persist to server then update DOM
+                var alertEl = document.getElementById('categoriaModalAlert');
+                var origSaveHtml = saveBtn ? saveBtn.innerHTML : '';
+
+                function showModalAlert(type, text){
+                    if(!alertEl) return window.alert(text);
+                    showAutoHideAlert(alertEl, type, text, 5000);
+                }
+
+                function doUpdate(){
+                    var row = document.querySelector('tr[data-id="' + id + '"]');
+                    if(window.fetch){
+                        if(saveBtn){ saveBtn.disabled = true; saveBtn.innerHTML = 'Guardando...'; }
+                        fetch('/api/categorias/' + encodeURIComponent(id), {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: name, active: !!active })
+                        }).then(function(res){ return res.json().then(function(body){ return { ok: res.ok, status: res.status, body: body }; }); })
+                        .then(function(r){
+                                            if(r && r.ok && r.body && r.body.ok){
+                                            var returned = r.body.data || {};
+                                            if(row){
+                                                row.setAttribute('data-name', name);
+                                                row.setAttribute('data-active', !!active);
+                                                var tdName = row.querySelector('td:nth-child(1)');
+                                                var tdEstado = row.querySelector('td:nth-child(2)');
+                                                var tdActions = row.querySelector('td:nth-child(3)');
+                                                if(tdName) tdName.innerHTML = '<div class="font-medium">' + (name || '') + '</div>';
+                                                if(tdEstado) tdEstado.innerHTML = (!!active ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Activo</span>' : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">Inactivo</span>');
+                                            }
+                                            // hide confirmation and clear handlers if present
+                                            if(confirmArea) confirmArea.classList.add('hidden');
+                                            if(confirmBtn) confirmBtn.onclick = null;
+                                            if(cancelConfirmBtn) cancelConfirmBtn.onclick = null;
+                                            closeCreate();
+                                        } else {
+                                var msg = (r && r.body && r.body.error) ? r.body.error : 'Error actualizando categoría';
+                                showModalAlert('error', msg);
+                            }
+                        }).catch(function(err){
+                            showModalAlert('error','Error de red al actualizar categoría');
+                        }).finally(function(){ if(saveBtn){ saveBtn.disabled = false; saveBtn.innerHTML = origSaveHtml; } });
+                        return;
+                    }
+
+                    // fallback: update DOM only
+                    if(row){
+                        row.setAttribute('data-name', name);
+                        row.setAttribute('data-active', !!active);
+                        var tdName = row.querySelector('td:nth-child(1)');
+                        var tdEstado = row.querySelector('td:nth-child(2)');
+                        var tdActions = row.querySelector('td:nth-child(3)');
+                        if(tdName) tdName.innerHTML = '<div class="font-medium">' + (name || '') + '</div>';
+                        if(tdEstado) tdEstado.innerHTML = (!!active ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Activo</span>' : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">Inactivo</span>');
+                    }
+                    closeCreate();
+                }
+
+                // show confirmation before performing update (reuse same confirm UI as create)
+                if(confirmArea && confirmText && confirmBtn && cancelConfirmBtn){
+                    confirmText.textContent = '¿Actualizar categoría con el nombre "' + (name || '-') + '"?';
+                    confirmArea.classList.remove('hidden');
+                    confirmBtn.onclick = function(){ doUpdate(); };
+                    cancelConfirmBtn.onclick = function(){ if(confirmArea) confirmArea.classList.add('hidden'); if(confirmBtn) confirmBtn.onclick = null; if(cancelConfirmBtn) cancelConfirmBtn.onclick = null; };
+                    setTimeout(function(){ confirmBtn && confirmBtn.focus(); }, 40);
+                } else {
+                    doUpdate();
+                }
+            } else { // create new row -> show confirmation first
+                if(confirmArea && confirmText && confirmBtn && cancelConfirmBtn){
+                    confirmText.textContent = '¿Crear nueva categoría con el nombre "' + (name || '-') + '"?';
+                    confirmArea.classList.remove('hidden');
+                    // wire handlers
+                    confirmBtn.onclick = function(){ doCreate(); };
+                    cancelConfirmBtn.onclick = function(){ if(confirmArea) confirmArea.classList.add('hidden'); };
+                    setTimeout(function(){ confirmBtn && confirmBtn.focus(); }, 40);
+                } else {
+                    // fallback: create immediately
+                    doCreate();
+                }
+            }
+        });
+    })();
+</script>

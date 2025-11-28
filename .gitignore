@@ -1,6 +1,3 @@
 # Archivos específicos a ignorar
 firebase.json
 .env
-
-# Directorios a ignorar
-node_modules/

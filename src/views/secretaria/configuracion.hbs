@@ -1,0 +1,312 @@
+<div class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
+    <div class="flex h-screen">
+        {{> secretaria_sidebar sections=sections active=active user=user}}
+        <main class="flex-1 p-6 flex flex-col min-h-0 overflow-auto text-[#5A3E2A]">
+            <!-- Font Awesome CDN -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+            <div class="w-full max-w-4xl mx-auto">
+                <header class="flex items-center justify-between mb-6">
+                    <div>
+                        <div class="flex items-center gap-0">
+                            <i class="fa-solid fa-cog mr-2 text-[#6B4F2B]" aria-hidden="true"></i>
+                            <h1 class="text-2xl font-semibold">Configuración</h1>
+                        </div>
+                        <p class="text-sm text-gray-500">Actualiza tu perfil, correo y contraseña.</p>
+                    </div>
+                    <div class="text-sm text-gray-600">Usuario: <strong class="text-[#6B4F2B]">{{user.nombre}} {{user.apellido}}</strong></div>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Perfil: nombre y apellido -->
+                    <section class="bg-white rounded-lg p-6 shadow-md">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fa-solid fa-user text-[#6B4F2B] text-lg" aria-hidden="true"></i>
+                            <h2 class="text-lg font-medium">Perfil</h2>
+                        </div>
+                        <form id="profileForm" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
+                                    <input id="firstName" name="firstName" type="text" inputmode="text" maxlength="50" pattern="[A-Za-zÀ-ÿ '\\-]+" title="Sólo letras, espacios, guiones o apóstrofes" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" value="{{user.nombre}}">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Apellido</label>
+                                    <input id="lastName" name="lastName" type="text" inputmode="text" maxlength="50" pattern="[A-Za-zÀ-ÿ '\\-]+" title="Sólo letras, espacios, guiones o apóstrofes" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" value="{{user.apellido}}">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button id="profileBtn" type="submit" class="bg-[#6B4F2B] text-white px-4 py-2 rounded flex items-center gap-2">
+                                    <span id="profileBtnSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                                    Guardar
+                                </button>
+                                <div id="profileMsg" class="text-sm" aria-live="polite"></div>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- Cambiar correo -->
+                    <section class="bg-white rounded-lg p-6 shadow-md">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fa-solid fa-envelope text-[#6B4F2B] text-lg" aria-hidden="true"></i>
+                            <h2 class="text-lg font-medium">Correo</h2>
+                        </div>
+                        <form id="emailForm" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Correo nuevo</label>
+                                <input id="newEmail" name="newEmail" maxlength="100" type="email" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" placeholder="nuevo@correo.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña actual</label>
+                                <div class="relative">
+                                    <input id="emailCurrentPassword" name="currentPassword" type="password" class="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" placeholder="Contraseña actual">
+                                    <button type="button" id="toggleEmailPwd" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" aria-label="Mostrar contraseña">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button id="emailBtn" type="submit" class="bg-white border border-[#6B4F2B] text-[#6B4F2B] px-4 py-2 rounded flex items-center gap-2">
+                                    <span id="emailBtnSpinner" class="hidden w-4 h-4 border-2 border-[#6B4F2B] border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                                    Cambiar correo
+                                </button>
+                                <div id="emailMsg" class="text-sm" aria-live="polite"></div>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- Cambiar contraseña (full width) -->
+                    <section class="bg-white rounded-lg p-6 shadow-md md:col-span-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fa-solid fa-lock text-[#6B4F2B] text-lg" aria-hidden="true"></i>
+                            <h2 class="text-lg font-medium">Contraseña</h2>
+                        </div>
+                        <form id="passwordForm" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña actual</label>
+                                    <div class="relative">
+                                        <input id="pwdCurrentPassword" name="currentPassword" maxlength="8" type="password" class="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" placeholder="Contraseña actual">
+                                        <button type="button" id="togglePwdCurrent" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" aria-label="Mostrar contraseña">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña nueva</label>
+                                    <div class="relative">
+                                        <input id="newPassword" name="newPassword" maxlength="8" type="password" class="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" placeholder="Nueva contraseña">
+                                        <button type="button" id="toggleNewPwd" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" aria-label="Mostrar contraseña nueva">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Confirmar</label>
+                                    <div class="relative">
+                                        <input id="confirmNewPassword" name="confirmNewPassword" maxlength="8" type="password" class="w-full border rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#E7D8C6]" placeholder="Repite la nueva contraseña">
+                                        <button type="button" id="toggleConfirmPwd" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" aria-label="Mostrar confirmar contraseña">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button id="passwordBtn" type="submit" class="bg-[#6B4F2B] text-white px-4 py-2 rounded flex items-center gap-2">
+                                    <span id="passwordBtnSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true"></span>
+                                    Cambiar contraseña
+                                </button>
+                                <div id="passwordMsg" class="text-sm" aria-live="polite"></div>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+
+            <script>
+                // Name validation: allow letters (with accents), spaces, hyphens and apostrophes
+                function sanitizeNameValue(s) {
+                    if (typeof s !== 'string') return '';
+                    // Allow letters, spaces, hyphen and apostrophe; remove everything else
+                    return s.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'\-]/g, '');
+                }
+
+                // Attach live sanitizers to name inputs so users can't type numbers/symbols
+                (function attachNameSanitizers(){
+                    ['firstName','lastName'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.addEventListener('input', (e) => {
+                            const cleaned = sanitizeNameValue(el.value);
+                            if (el.value !== cleaned) {
+                                const pos = el.selectionStart != null ? el.selectionStart - 1 : null;
+                                el.value = cleaned;
+                                if (pos !== null) el.setSelectionRange(pos, pos);
+                            }
+                        });
+                    });
+                })();
+
+                function showMessage(elId, text, type) {
+                    const el = document.getElementById(elId);
+                    if (!el) return;
+                    // clear any existing scheduled clear
+                    if (el._clearTimer) { clearTimeout(el._clearTimer); el._clearTimer = null; }
+                    el.textContent = text || '';
+                    el.classList.remove('text-green-600','text-red-600','text-gray-600');
+                    if (type === 'success') el.classList.add('text-green-600');
+                    else if (type === 'error') el.classList.add('text-red-600');
+                    else el.classList.add('text-gray-600');
+
+                    // Auto-clear success/error messages after 5s. Do not auto-clear loading state.
+                    if (type === 'success' || type === 'error') {
+                        el._clearTimer = setTimeout(() => {
+                            el.textContent = '';
+                            el._clearTimer = null;
+                        }, 5000);
+                    }
+                }
+
+                function setLoading(button, spinnerId, loading) {
+                    const btn = document.getElementById(button);
+                    const spinner = document.getElementById(spinnerId);
+                    if (!btn) return;
+                    if (loading) {
+                        btn.setAttribute('disabled','disabled');
+                        if (spinner) spinner.classList.remove('hidden');
+                    } else {
+                        btn.removeAttribute('disabled');
+                        if (spinner) spinner.classList.add('hidden');
+                    }
+                }
+
+                async function patchJSON(url, body) {
+                    try {
+                        const resp = await fetch(url, {
+                            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(body)
+                        });
+                        const data = await resp.json().catch(()=>null);
+                        if (!resp.ok) {
+                            return { ok: false, error: (data && data.error) ? data.error : 'Error del servidor' };
+                        }
+                        return data || { ok: true };
+                    } catch (e) {
+                        return { ok: false, error: 'No se pudo conectar al servidor' };
+                    }
+                }
+
+                // Profile
+                document.getElementById('profileForm').addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const firstNameEl = document.getElementById('firstName');
+                    const lastNameEl = document.getElementById('lastName');
+                    const firstName = firstNameEl.value.trim();
+                    const lastName = lastNameEl.value.trim();
+                    const msgId = 'profileMsg';
+
+                    // Validate: ensure values contain only allowed characters (if provided)
+                    if (firstName && sanitizeNameValue(firstName) !== firstName) {
+                        showMessage(msgId, 'El nombre sólo debe contener letras, espacios, guiones o apóstrofes.', 'error');
+                        return;
+                    }
+                    if (lastName && sanitizeNameValue(lastName) !== lastName) {
+                        showMessage(msgId, 'El apellido sólo debe contener letras, espacios, guiones o apóstrofes.', 'error');
+                        return;
+                    }
+
+                    // At least one field required by server
+                    if (!firstName && !lastName) {
+                        showMessage(msgId, 'Ingresa nombre o apellido para actualizar.', 'error');
+                        return;
+                    }
+
+                    showMessage(msgId, 'Guardando...', 'loading');
+                    setLoading('profileBtn','profileBtnSpinner', true);
+                    const res = await patchJSON('/api/profile', { firstName, lastName });
+                    setLoading('profileBtn','profileBtnSpinner', false);
+                    if (res && res.ok) {
+                        showMessage(msgId, 'Perfil actualizado.', 'success');
+                    } else {
+                        showMessage(msgId, res && res.error ? res.error : 'Error actualizando perfil.', 'error');
+                    }
+                });
+
+                // Email
+                document.getElementById('emailForm').addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const newEmail = document.getElementById('newEmail').value.trim();
+                    const currentPassword = document.getElementById('emailCurrentPassword').value;
+                    const msgId = 'emailMsg';
+                    if (!newEmail || !currentPassword) { showMessage(msgId, 'Completa los campos.', 'error'); return; }
+                    showMessage(msgId, 'Enviando solicitud...', 'loading');
+                    setLoading('emailBtn','emailBtnSpinner', true);
+                    const res = await patchJSON('/api/change-email', { newEmail, currentPassword });
+                    setLoading('emailBtn','emailBtnSpinner', false);
+                    if (res && res.ok) {
+                        showMessage(msgId, 'Correo cambiado. Revisa tu bandeja para verificar.', 'success');
+                        document.getElementById('newEmail').value = '';
+                        document.getElementById('emailCurrentPassword').value = '';
+                    } else {
+                        showMessage(msgId, res && res.error ? res.error : 'Error cambiando correo.', 'error');
+                    }
+                });
+
+                // Password
+                document.getElementById('passwordForm').addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const currentPassword = document.getElementById('pwdCurrentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+                    const msgId = 'passwordMsg';
+
+                    if (!currentPassword || !newPassword || !confirmNewPassword) { showMessage(msgId, 'Completa los campos.', 'error'); return; }
+                    if (newPassword !== confirmNewPassword) { showMessage(msgId, 'Las contraseñas no coinciden.', 'error'); return; }
+                    if (newPassword.length < 6) { showMessage(msgId, 'La contraseña debe tener al menos 6 caracteres.', 'error'); return; }
+                    showMessage(msgId, 'Enviando solicitud...', 'loading');
+                    setLoading('passwordBtn','passwordBtnSpinner', true);
+                    const res = await patchJSON('/api/change-password', { currentPassword, newPassword });
+                    setLoading('passwordBtn','passwordBtnSpinner', false);
+                    if (res && res.ok) {
+                        showMessage(msgId, 'Contraseña actualizada. Debes iniciar sesión de nuevo.', 'success');
+                        document.getElementById('pwdCurrentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmNewPassword').value = '';
+                    } else {
+                        showMessage(msgId, res && res.error ? res.error : 'Error cambiando contraseña.', 'error');
+                    }
+                });
+
+                // Password visibility toggles
+                function setupPasswordToggle(buttonId, inputId) {
+                    const btn = document.getElementById(buttonId);
+                    const input = document.getElementById(inputId);
+                    if (!btn || !input) return;
+                    btn.addEventListener('click', function(){
+                        const icon = btn.querySelector('i');
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+                            btn.setAttribute('aria-label','Ocultar contraseña');
+                        } else {
+                            input.type = 'password';
+                            if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+                            btn.setAttribute('aria-label','Mostrar contraseña');
+                        }
+                    });
+                }
+
+                // Initialize toggles (safely, if elements exist)
+                ['toggleEmailPwd','togglePwdCurrent','toggleNewPwd','toggleConfirmPwd'].forEach(id => {
+                    const map = {
+                        'toggleEmailPwd': 'emailCurrentPassword',
+                        'togglePwdCurrent': 'pwdCurrentPassword',
+                        'toggleNewPwd': 'newPassword',
+                        'toggleConfirmPwd': 'confirmNewPassword'
+                    };
+                    setupPasswordToggle(id, map[id]);
+                });
+
+            </script>
+        </main>
+    </div>
+</div>

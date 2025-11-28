@@ -1,0 +1,1095 @@
+<div class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen">
+    <style>
+        /* Main content text in brown for consistency with admin dashboard */
+        .main-text-brown, .main-text-brown * { color: #5A3E2A !important; }
+        /* Respect existing white text utilities when explicitly used */
+        .main-text-brown .text-white, .main-text-brown .text-white * { color: #ffffff !important; }
+        /* Preserve action link colors for edit/delete so their icons stay as originally styled */
+        .main-text-brown a.text-blue-600, .main-text-brown a.text-blue-600 * { color: #2563EB !important; }
+        .main-text-brown a.text-red-600, .main-text-brown a.text-red-600 * { color: #DC2626 !important; }
+        /* Also handle the case where anchors use aria-label instead of utility color directly */
+        .main-text-brown a[aria-label="Editar usuario"] i, .main-text-brown a[aria-label="Editar usuario"] * { color: #2563EB !important; }
+        .main-text-brown a[aria-label="Eliminar usuario"] i, .main-text-brown a[aria-label="Eliminar usuario"] * { color: #DC2626 !important; }
+    </style>
+    <div class="flex h-screen">
+        {{> admin_sidebar sections=sections active=active user=user}}
+
+    <main class="flex-1 p-6 flex flex-col min-h-0 overflow-hidden main-text-brown">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-0">
+                    <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    <h1 class="text-2xl font-bold">Usuarios</h1>
+                </div>
+                <a href="#" class="inline-flex items-center gap-2 px-4 py-2 bg-[#F5EBDD] rounded-lg border border-[#E0D5C5] hover:bg-[#efe3cc] focus:outline-none focus:ring-2 focus:ring-[#E0D5C5]" aria-label="Nuevo Usuario">
+                    <i class="fa-solid fa-plus h-5 w-5 text-[#6B4F2B]" aria-hidden="true"></i>
+                    <span class="font-medium text-sm text-[#6B4F2B]">Nuevo Usuario</span>
+                </a>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 w-full md:w-1/2">
+                        <label for="userSearch" class="sr-only">Buscar usuarios</label>
+                    <i class="fa-solid fa-magnifying-glass text-gray-500 pl-2" aria-hidden="true"></i>
+                    <input id="userSearch" type="search" placeholder="Buscar por nombre o correo" class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Buscar usuarios" />
+                    
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="roleFilter" class="text-sm font-medium text-gray-700 inline-flex items-center">
+                        <i class="fa-solid fa-filter mr-2 text-gray-600" aria-hidden="true"></i>
+                        Filtrar por rol:
+                    </label>
+                    <select id="roleFilter" class="appearance-none rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Filtrar por rol">
+                        <option value="all">Todos</option>
+                        <option value="terapeuta">Terapeuta</option>
+                        <option value="secretario">Secretario</option>
+                        <option value="admin">Admin</option>
+                        <option value="cliente">Cliente</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Modal: Nuevo Usuario -->
+            <div id="nuevoUsuarioModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 overflow-visible" aria-hidden="true" role="dialog" aria-modal="true">
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 overflow-visible max-h-[90vh] overflow-auto">
+                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                        <h2 class="text-lg font-semibold">Nuevo Usuario</h2>
+                        <button type="button" id="closeModalBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <form id="nuevoUsuarioForm">
+                            <!-- Alert area -->
+                            <div id="modalAlert" class="hidden mb-4"></div>
+
+                            <!-- Styled confirmation (hidden until needed) -->
+                            <div id="modalConfirm" class="hidden mb-4 p-4 rounded border border-gray-200 bg-gray-50">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex-1">
+                                        <p id="modalConfirmText" class="text-sm text-gray-800">¿Confirmar creación de este usuario?</p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" id="cancelConfirmBtn" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Cancelar</button>
+                                        <button type="button" id="confirmCreateBtn" class="px-3 py-1 rounded bg-[#6B4F2B] text-white hover:bg-[#5a3f23]">Confirmar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fa-solid fa-user text-gray-400"></i>
+                                            </div>
+                                            <input id="nombre" name="nombre" type="text" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Nombre" />
+                                        </div>
+                                </div>
+
+                                <div>
+                                    <label for="apellido" class="block text-sm font-medium text-gray-700">Apellido</label>
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fa-solid fa-id-badge text-gray-400"></i>
+                                            </div>
+                                            <input id="apellido" name="apellido" type="text" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Apellido" />
+                                        </div>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="correo" class="block text-sm font-medium text-gray-700">Correo</label>
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fa-solid fa-envelope text-gray-400"></i>
+                                            </div>
+                                            <input id="correo" name="correo" type="email" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="correo@ejemplo.com" />
+                                        </div>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="contrasena" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fa-solid fa-lock text-gray-400"></i>
+                                            </div>
+                                            <input id="contrasena" name="contrasena" type="password" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="••••••••" />
+                                        </div>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="rol" class="block text-sm font-medium text-gray-700">Rol</label>
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i class="fa-solid fa-user-tag text-gray-400"></i>
+                                            </div>
+                                            <select id="rol" name="rol" class="appearance-none w-full pl-10 pr-10 py-2 rounded-md border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] relative z-50" aria-label="Seleccionar rol">
+                                            <option value="terapeuta">Terapeuta</option>
+                                            <option value="secretario">Secretario</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                                            <i class="fa-solid fa-chevron-down text-gray-500" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button type="button" id="cancelModalBtn" class="px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50">Cancelar</button>
+                                <button type="submit" id="saveModalBtn" class="px-4 py-2 rounded bg-[#6B4F2B] text-white hover:bg-[#5a3f23]">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <section aria-labelledby="usersHeading" class="mb-8 overflow-auto flex-1">
+                <h2 id="usersHeading" class="sr-only">Listado de usuarios</h2>
+
+                {{#if error}}
+                    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">{{error}}</div>
+                {{/if}}
+
+                {{#if users}}
+                    {{#if users.length}}
+                        <div class="bg-white p-4 rounded shadow">
+                            <div class="overflow-x-auto">
+                            <table class="min-w-full leading-normal divide-y">
+                            <thead>
+                                <tr class="text-left">
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-600 border-b">
+                                        <i class="fa-solid fa-user h-4 w-4 mr-2 text-gray-600" aria-hidden="true"></i>
+                                        <span>Nombre</span>
+                                    </th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-600 border-b">
+                                        <i class="fa-solid fa-envelope h-4 w-4 mr-2 text-gray-600" aria-hidden="true"></i>
+                                        <span>Correo</span>
+                                    </th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-600 border-b">
+                                        <i class="fa-solid fa-user-tag h-4 w-4 mr-2 text-gray-600" aria-hidden="true"></i>
+                                        <span>Rol</span>
+                                    </th>
+                                    <th class="px-6 py-3 text-sm font-medium text-gray-600 border-b">
+                                        <i class="fa-solid fa-ellipsis-h h-4 w-4 mr-2 text-gray-600" aria-hidden="true"></i>
+                                        <span>Acciones</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y">
+                                {{#each users}}
+                                <tr class="hover:bg-gray-50" data-uid="{{this.id}}" data-nombre="{{#if this.nombre}}{{this.nombre}} {{this.apellido}}{{else}}{{this.correo}}{{/if}}" data-correo="{{this.correo}}" data-rol="{{this.rol}}" data-servicio="{{this.terapeuta_servicio}}">
+                                    <td class="px-6 py-4 whitespace-nowrap border-b">
+                                        <div class="text-sm text-gray-800">{{#if this.nombre}}{{this.nombre}} {{this.apellido}}{{else}}-{{/if}}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b">
+                                        <div class="text-sm text-gray-600">{{this.correo}}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">{{this.rol}}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-b">
+                                        <div class="flex items-center gap-4">
+                                            <a href="#" class="inline-flex items-center text-blue-600 hover:underline" aria-label="Editar usuario">
+                                                <i class="fa-solid fa-pen-to-square h-4 w-4 mr-1" aria-hidden="true"></i>
+                                                <span class="text-sm">Editar</span>
+                                            </a>
+
+                                            <a href="#" class="inline-flex items-center text-red-600 hover:underline delete-user-btn" aria-label="Eliminar usuario" data-uid="{{this.id}}" data-correo="{{this.correo}}" data-nombre="{{#if this.nombre}}{{this.nombre}} {{this.apellido}}{{else}}{{this.correo}}{{/if}}">
+                                                <i class="fa-solid fa-trash h-4 w-4 mr-1" aria-hidden="true"></i>
+                                                
+                                                <span class="text-sm">Eliminar</span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                                <!-- No results row -->
+                                <tr id="noResultsRow" class="hidden">
+                                    <td class="px-6 py-4 whitespace-nowrap border-b" colspan="4">
+                                        <div class="text-sm text-gray-600">No se encontraron usuarios que coincidan.</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="bg-white p-6 rounded shadow">No hay usuarios registrados.</div>
+                {{/if}}
+            {{else}}
+                <div class="bg-white p-6 rounded shadow">Cargando...</div>
+            {{/if}}
+        </main>
+    </div>
+</div>
+
+<!-- Success modal for admin feedback -->
+<div id="pageAlertModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+        <div class="flex items-start justify-between px-6 py-4 border-b">
+            <h2 id="pageAlertTitle" class="text-lg font-semibold">Operación</h2>
+            <button type="button" id="closePageAlertBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <p id="pageAlertMessage" class="text-sm text-gray-800">Mensaje</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var openBtn = document.querySelector('[aria-label="Nuevo Usuario"]');
+        var modal = document.getElementById('nuevoUsuarioModal');
+        var closeBtn = document.getElementById('closeModalBtn');
+        var cancelBtn = document.getElementById('cancelModalBtn');
+        var firstInput = document.getElementById('nombre');
+
+        function openModal(e){
+            e && e.preventDefault();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.setAttribute('aria-hidden','false');
+            setTimeout(function(){ firstInput && firstInput.focus(); }, 50);
+        }
+
+        function closeModal(e){
+            e && e.preventDefault();
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden','true');
+            openBtn && openBtn.focus();
+        }
+
+        openBtn && openBtn.addEventListener('click', openModal);
+        closeBtn && closeBtn.addEventListener('click', closeModal);
+        cancelBtn && cancelBtn.addEventListener('click', closeModal);
+
+        // close on ESC
+        document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(modal && !modal.classList.contains('hidden')) closeModal(); }});
+    })();
+</script>
+
+    <script>
+        (function(){
+            var form = document.getElementById('nuevoUsuarioForm');
+            var saveBtn = document.getElementById('saveModalBtn');
+            var cancelBtn = document.getElementById('cancelModalBtn');
+            var modal = document.getElementById('nuevoUsuarioModal');
+
+            if(!form) return;
+
+            // Validation helpers (allow letters, spaces and common Spanish accents)
+            function validateName(name){
+                if(!name) return true; // allow empty if optional
+                var re = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
+                return re.test(name.trim());
+            }
+
+            function sanitizeNameValue(v){
+                return (v||'').replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]/g, '');
+            }
+
+            function validatePassword(p){
+                return typeof p === 'string' && p.length >= 6;
+            }
+
+            var inNombre = document.getElementById('nombre');
+            var inApellido = document.getElementById('apellido');
+            var inContrasena = document.getElementById('contrasena');
+
+            // Live sanitize: remove invalid chars as user types
+            [inNombre, inApellido].forEach(function(el){
+                if(!el) return;
+                el.addEventListener('input', function(){
+                    var cleaned = sanitizeNameValue(el.value);
+                    if(cleaned !== el.value){ el.value = cleaned; }
+                });
+            });
+
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+
+                var formData = new FormData(form);
+                var payload = {};
+                formData.forEach(function(v,k){ payload[k] = v; });
+
+                var alertEl = document.getElementById('modalAlert');
+                function showAlert(type, text){
+                    if(!alertEl) return;
+                    alertEl.className = '';
+                    alertEl.classList.add('mb-4','p-3','rounded');
+                    if(type === 'error') { alertEl.classList.add('bg-red-100','text-red-700'); }
+                    else if(type === 'success') { alertEl.classList.add('bg-green-100','text-green-700'); }
+                    else { alertEl.classList.add('bg-yellow-100','text-yellow-700'); }
+                    alertEl.textContent = text;
+                    alertEl.classList.remove('hidden');
+                }
+
+                // Basic validation
+                if(!payload.correo || !payload.contrasena){
+                    showAlert('error','Correo y contraseña son requeridos');
+                    return;
+                }
+
+                // Password length
+                if(!validatePassword(payload.contrasena)){
+                    showAlert('error','La contraseña debe tener al menos 6 caracteres');
+                    return;
+                }
+
+                // Validate nombre/apellido (if provided)
+                if(payload.nombre && !validateName(payload.nombre)){
+                    showAlert('error','El nombre solo puede contener letras y espacios');
+                    return;
+                }
+
+                if(payload.apellido && !validateName(payload.apellido)){
+                    showAlert('error','El apellido solo puede contener letras y espacios');
+                    return;
+                }
+
+                // Show styled confirmation
+                var confirmArea = document.getElementById('modalConfirm');
+                var confirmText = document.getElementById('modalConfirmText');
+                var confirmBtn = document.getElementById('confirmCreateBtn');
+                var cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+
+                if(confirmArea && confirmText){
+                    confirmText.textContent = '¿Crear nuevo usuario con el correo ' + (payload.correo || '') + '?';
+                    confirmArea.classList.remove('hidden');
+                }
+
+                function doCreate(){
+                    // hide confirm area and show loading
+                    confirmArea && confirmArea.classList.add('hidden');
+                    saveBtn && (saveBtn.disabled = true);
+                    saveBtn && (saveBtn.textContent = 'Guardando...');
+
+                    fetch('/admin/usuarios', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).then(function(res){
+                        return res.json().then(function(d){ return { ok: res.ok, status: res.status, body: d }; });
+                    }).then(function(r){
+                        if(r.ok && r.body && r.body.ok){
+                            showAlert('success','Usuario creado correctamente. Recargando...');
+                            setTimeout(function(){ window.location.reload(); }, 900);
+                        } else {
+                            var msg = (r.body && r.body.error) ? r.body.error : 'Error al crear usuario';
+                            showAlert('error', msg);
+                        }
+                    }).catch(function(err){
+                        console.error(err);
+                        showAlert('error','Error de red al crear usuario');
+                    }).finally(function(){
+                        saveBtn && (saveBtn.disabled = false);
+                        saveBtn && (saveBtn.textContent = 'Guardar');
+                    });
+                }
+
+                if(confirmBtn) confirmBtn.onclick = doCreate;
+                if(cancelConfirmBtn) cancelConfirmBtn.onclick = function(){ confirmArea && confirmArea.classList.add('hidden'); };
+            });
+        })();
+    </script>
+
+    <script>
+        (function(){
+            // Live search + role filter for users table
+            var searchInput = document.getElementById('userSearch');
+            var roleSelect = document.getElementById('roleFilter');
+            var clearBtn = document.getElementById('clearSearchBtn');
+            var tableBody = document.querySelector('table tbody');
+            var rows = tableBody ? Array.prototype.slice.call(tableBody.querySelectorAll('tr')) : [];
+            var noResultsRow = document.getElementById('noResultsRow');
+
+            // Only keep data rows (exclude the noResultsRow)
+            function dataRows(){
+                return rows.filter(function(r){ return r.id !== 'noResultsRow'; });
+            }
+
+            function normalize(s){ return (s||'').toString().toLowerCase().trim(); }
+
+            function applyFilter(){
+                var q = normalize(searchInput && searchInput.value);
+                var role = roleSelect ? roleSelect.value : 'all';
+                var anyVisible = false;
+
+                dataRows().forEach(function(row){
+                    var nombre = normalize(row.getAttribute('data-nombre'));
+                    var correo = normalize(row.getAttribute('data-correo'));
+                    var rol = (row.getAttribute('data-rol') || '').toString();
+
+                    var matchesQuery = !q || nombre.indexOf(q) !== -1 || correo.indexOf(q) !== -1;
+                    var matchesRole = (role === 'all') || (rol === role);
+
+                    if(matchesQuery && matchesRole){
+                        row.style.display = '';
+                        anyVisible = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if(noResultsRow){
+                    if(!anyVisible) noResultsRow.classList.remove('hidden');
+                    else noResultsRow.classList.add('hidden');
+                }
+            }
+
+            // Debounce helper
+            function debounce(fn, wait){
+                var t;
+                return function(){
+                    var args = arguments;
+                    clearTimeout(t);
+                    t = setTimeout(function(){ fn.apply(null, args); }, wait);
+                };
+            }
+
+            if(searchInput){
+                searchInput.addEventListener('input', debounce(applyFilter, 180));
+            }
+
+            if(roleSelect){
+                roleSelect.addEventListener('change', applyFilter);
+            }
+
+            if(clearBtn){
+                clearBtn.addEventListener('click', function(e){ e && e.preventDefault(); if(searchInput) searchInput.value = ''; applyFilter(); searchInput && searchInput.focus(); });
+            }
+
+            // initialize
+            applyFilter();
+        })();
+    </script>
+
+    <!-- Edit User modal (design-only) -->
+    <div id="editarUsuarioModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 overflow-visible" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 overflow-visible max-h-[90vh] overflow-auto">
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+                <h2 class="text-lg font-semibold">Editar Usuario</h2>
+                <button type="button" id="closeEditModalBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal editar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="editarUsuarioForm">
+                    <div id="editModalAlert" class="hidden mb-4"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="edit_nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-user text-gray-400"></i>
+                                </div>
+                                <input id="edit_nombre" name="nombre" type="text" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Nombre" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="edit_apellido" class="block text-sm font-medium text-gray-700">Apellido</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-id-badge text-gray-400"></i>
+                                </div>
+                                <input id="edit_apellido" name="apellido" type="text" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="Apellido" />
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="edit_correo" class="block text-sm font-medium text-gray-700">Correo</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-envelope text-gray-400"></i>
+                                </div>
+                                <input id="edit_correo" name="correo" type="email" class="block w-full pl-10 pr-3 py-2 rounded-md border-gray-300 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" placeholder="correo@ejemplo.com" />
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="edit_rol" class="block text-sm font-medium text-gray-700">Rol</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-user-tag text-gray-400"></i>
+                                </div>
+                                <select id="edit_rol" name="rol" class="appearance-none w-full pl-10 pr-10 py-2 rounded-md border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B] relative z-50" aria-label="Seleccionar rol">
+                                    <option value="terapeuta">Terapeuta</option>
+                                    <option value="secretario">Secretario</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="cliente">Cliente</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                                    <i class="fa-solid fa-chevron-down text-gray-500" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campo opcional: ligar terapeuta a un servicio (solo diseño, visible si rol === 'terapeuta') -->
+                        <div id="edit_terapeuta_servicio_container" class="md:col-span-2 hidden">
+                            <label for="edit_terapeuta_servicio" class="block text-sm font-medium text-gray-700">Servicio asignado (terapeuta)</label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-hand-holding-medical text-gray-400"></i>
+                                </div>
+                                <select id="edit_terapeuta_servicio" name="terapeuta_servicio" class="appearance-none w-full pl-10 pr-10 py-2 rounded-md border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Seleccionar servicio para terapeuta">
+                                    <option value="">-- Ninguno --</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                                    <i class="fa-solid fa-chevron-down text-gray-500" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="edit_uid" name="uid" value="" />
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" id="cancelEditModalBtn" class="px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50">Cancelar</button>
+                        <button type="submit" id="saveEditModalBtn" class="px-4 py-2 rounded bg-[#6B4F2B] text-white hover:bg-[#5a3f23]">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            // Wire up Edit buttons to open the Edit modal with data from the row (design-only)
+            var editModal = document.getElementById('editarUsuarioModal');
+            var closeEdit = document.getElementById('closeEditModalBtn');
+            var cancelEdit = document.getElementById('cancelEditModalBtn');
+            var editForm = document.getElementById('editarUsuarioForm');
+
+            function openEditModal(){
+                if(!editModal) return;
+                editModal.classList.remove('hidden');
+                editModal.classList.add('flex');
+                editModal.setAttribute('aria-hidden','false');
+            }
+
+            function closeEditModal(){
+                if(!editModal) return;
+                editModal.classList.remove('flex');
+                editModal.classList.add('hidden');
+                editModal.setAttribute('aria-hidden','true');
+            }
+
+            // Simple in-memory cache for servicios
+            var serviciosCache = null;
+
+            // Fetch servicios from API (if not loaded) and cache them
+            function fetchServicios(){
+                if(serviciosCache) return Promise.resolve(serviciosCache);
+                return fetch('/api/servicios').then(function(res){ return res.json(); }).then(function(d){
+                    if(d && d.ok && Array.isArray(d.servicios)){
+                        serviciosCache = d.servicios.map(function(s){ return { id: s.id, label: s.servicio || s.name || (s.categoria || '') }; });
+                    } else {
+                        serviciosCache = [];
+                    }
+                    return serviciosCache;
+                }).catch(function(){ serviciosCache = []; return serviciosCache; });
+            }
+
+            function populateServiciosSelect(selectedId){
+                var sel = document.getElementById('edit_terapeuta_servicio');
+                if(!sel) return;
+                // clear existing options (keep the default first option)
+                var currentFirst = sel.querySelector('option');
+                sel.innerHTML = '';
+                var defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = '-- Ninguno --';
+                sel.appendChild(defaultOpt);
+
+                // Build a set of servicio ids that are already assigned to a terapeuta
+                // We'll read them from the users table rows which include data-servicio or data-servicio-id
+                var assigned = new Set();
+                try{
+                    var tableRows = document.querySelectorAll('table tbody tr');
+                    tableRows.forEach(function(r){
+                        try{
+                            var role = (r.getAttribute && (r.getAttribute('data-rol') || '') || '').toString().toLowerCase();
+                            if(role === 'terapeuta'){
+                                var sid = r.getAttribute && (r.getAttribute('data-servicio') || r.getAttribute('data-servicio-id'));
+                                if(sid) assigned.add(String(sid));
+                            }
+                        }catch(e){}
+                    });
+                }catch(e){ /* ignore DOM read errors */ }
+
+                (serviciosCache || []).forEach(function(s){
+                    var id = s.id || '';
+                    // Skip services already assigned to another therapist, but allow the currently
+                    // selected service (selectedId) so the therapist being edited can keep it.
+                    if(id && assigned.has(String(id)) && String(id) !== String(selectedId)){
+                        return; // skip
+                    }
+                    var opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = s.label || id || 'Servicio';
+                    sel.appendChild(opt);
+                });
+
+                if(typeof selectedId !== 'undefined' && selectedId !== null){ sel.value = selectedId; }
+            }
+
+            function updateTherapistServiceVisibility(role, selectedId){
+                var container = document.getElementById('edit_terapeuta_servicio_container');
+                if(!container) return;
+                if(String(role || '').toLowerCase() === 'terapeuta'){
+                    // ensure servicios loaded then show
+                    fetchServicios().then(function(){ populateServiciosSelect(selectedId); container.classList.remove('hidden'); });
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+
+            // Delegate clicks from Edit links. Blocks editing when role === 'cliente'.
+            function showDisabledEditAlert(){
+                var alertModal = document.getElementById('pageAlertModal');
+                var alertMsg = document.getElementById('pageAlertMessage');
+                var alertTitle = document.getElementById('pageAlertTitle');
+                if(alertMsg) alertMsg.textContent = 'No autorizado: no puedes editar usuarios con rol "cliente".';
+                if(alertTitle) alertTitle.textContent = 'Atención';
+                if(alertModal){
+                    alertModal.classList.remove('hidden');
+                    alertModal.classList.add('flex');
+                    alertModal.setAttribute('aria-hidden','false');
+                    setTimeout(function(){ if(alertModal){ alertModal.classList.remove('flex'); alertModal.classList.add('hidden'); alertModal.setAttribute('aria-hidden','true'); } }, 2500);
+                }
+            }
+
+            // On load, visually disable Edit links for clientes so it's clear they are not editable
+            document.addEventListener('DOMContentLoaded', function(){
+                var tableBody = document.querySelector('table tbody');
+                if(!tableBody) return;
+                var rows = tableBody.querySelectorAll('tr');
+                rows.forEach(function(tr){
+                    var rol = (tr.getAttribute('data-rol') || '').toString().toLowerCase();
+                    if(rol === 'cliente'){
+                        var editLink = tr.querySelector('a[aria-label="Editar usuario"]');
+                        if(editLink){
+                            // Make it appear disabled and non-interactive
+                            editLink.setAttribute('aria-disabled','true');
+                            editLink.removeAttribute('href');
+                            editLink.setAttribute('title','No se puede editar usuarios con rol cliente');
+                            editLink.setAttribute('tabindex','-1');
+                            // Tailwind utility classes (project already uses Tailwind in templates)
+                            editLink.classList.add('pointer-events-none','opacity-50','cursor-not-allowed','text-gray-400');
+                        }
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(e){
+                var btn = e.target.closest && e.target.closest('a[aria-label="Editar usuario"]');
+                if(!btn) return;
+                e.preventDefault();
+
+                // find containing row
+                var row = btn.closest && btn.closest('tr');
+                if(!row) return openEditModal();
+
+                var rol = (row.getAttribute('data-rol') || '').toString().toLowerCase();
+                if(rol === 'cliente' || btn.getAttribute('aria-disabled') === 'true'){
+                    // Block opening the edit modal for clients
+                    showDisabledEditAlert();
+                    return;
+                }
+
+                var uid = row.getAttribute('data-uid') || '';
+                var nombre = row.getAttribute('data-nombre') || '';
+                var correo = row.getAttribute('data-correo') || '';
+                var rolFull = row.getAttribute('data-rol') || '';
+
+                // Try to split nombre into nombre/apellido if possible
+                var first = '';
+                var last = '';
+                if(nombre){
+                    var parts = nombre.split(' ');
+                    first = parts.shift() || '';
+                    last = parts.join(' ') || '';
+                }
+
+                var in_nombre = document.getElementById('edit_nombre');
+                var in_apellido = document.getElementById('edit_apellido');
+                var in_correo = document.getElementById('edit_correo');
+                var in_rol = document.getElementById('edit_rol');
+                var in_uid = document.getElementById('edit_uid');
+
+                if(in_nombre) in_nombre.value = first;
+                if(in_apellido) in_apellido.value = last;
+                if(in_correo) in_correo.value = correo;
+                if(in_rol) in_rol.value = rolFull;
+                if(in_uid) in_uid.value = uid;
+
+                // If the row carries an assigned servicio id (data-servicio), try to use it
+                var assignedServicio = row.getAttribute && (row.getAttribute('data-servicio') || row.getAttribute('data-servicio-id')) || '';
+
+                // Update visibility of therapist service field depending on role
+                updateTherapistServiceVisibility(rolFull, assignedServicio || '');
+
+                openEditModal();
+                // focus first field for accessibility
+                setTimeout(function(){ in_nombre && in_nombre.focus(); }, 60);
+            });
+
+            if(closeEdit) closeEdit.addEventListener('click', closeEditModal);
+            if(cancelEdit) cancelEdit.addEventListener('click', closeEditModal);
+
+            // Show/hide therapist-service field when role select changes
+            var editRolEl = document.getElementById('edit_rol');
+            if(editRolEl){
+                editRolEl.addEventListener('change', function(e){ updateTherapistServiceVisibility(e.target && e.target.value); });
+            }
+
+            // Close on ESC
+            document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(editModal && !editModal.classList.contains('hidden')) closeEditModal(); }});
+
+            // Submit handler: send PUT to update user and update table row on success
+            // Validation helpers for edit modal (letters, spaces, Spanish accents)
+            function validateNameEdit(name){
+                if(!name) return true; // allow empty
+                var re = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
+                return re.test(name.trim());
+            }
+
+            function sanitizeNameEdit(v){
+                return (v||'').replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]/g, '');
+            }
+
+            // Live sanitize inputs in edit modal
+            var editInNombre = document.getElementById('edit_nombre');
+            var editInApellido = document.getElementById('edit_apellido');
+            [editInNombre, editInApellido].forEach(function(el){ if(!el) return; el.addEventListener('input', function(){ var cleaned = sanitizeNameEdit(el.value); if(cleaned !== el.value) el.value = cleaned; }); });
+
+            if(editForm){
+                editForm.addEventListener('submit', function(e){
+                    e && e.preventDefault();
+                    e && e.stopPropagation();
+                    var in_nombre = document.getElementById('edit_nombre');
+                    var in_apellido = document.getElementById('edit_apellido');
+                    var in_correo = document.getElementById('edit_correo');
+                    var in_rol = document.getElementById('edit_rol');
+                    var in_uid = document.getElementById('edit_uid');
+                    var alertEl = document.getElementById('editModalAlert');
+
+                    var payload = {
+                        nombre: in_nombre ? in_nombre.value : undefined,
+                        apellido: in_apellido ? in_apellido.value : undefined,
+                        correo: in_correo ? in_correo.value : undefined,
+                        rol: in_rol ? in_rol.value : undefined
+                    };
+
+                    // If the role is terapeuta, include the selected servicio (design-only)
+                    try{
+                        var in_servicio = document.getElementById('edit_terapeuta_servicio');
+                        if(in_servicio && payload.rol && String(payload.rol).toLowerCase() === 'terapeuta'){
+                            payload.terapeuta_servicio = in_servicio.value || null;
+                        }
+                    }catch(e){ /* ignore if select not present */ }
+
+                    // Validate nombre/apellido
+                    if(payload.nombre && !validateNameEdit(payload.nombre)){
+                        if(alertEl){ alertEl.className=''; alertEl.classList.add('mb-4','p-3','rounded','bg-red-100','text-red-700'); alertEl.textContent = 'El nombre solo puede contener letras y espacios.'; alertEl.classList.remove('hidden'); }
+                        return;
+                    }
+
+                    if(payload.apellido && !validateNameEdit(payload.apellido)){
+                        if(alertEl){ alertEl.className=''; alertEl.classList.add('mb-4','p-3','rounded','bg-red-100','text-red-700'); alertEl.textContent = 'El apellido solo puede contener letras y espacios.'; alertEl.classList.remove('hidden'); }
+                        return;
+                    }
+
+                    var uid = in_uid ? in_uid.value : null;
+                    if(!uid){
+                        if(alertEl){ alertEl.className=''; alertEl.classList.add('mb-4','p-3','rounded','bg-red-100','text-red-700'); alertEl.textContent = 'UID desconocido.'; alertEl.classList.remove('hidden'); }
+                        return;
+                    }
+
+                    // Disable submit
+                    var saveBtn = document.getElementById('saveEditModalBtn');
+                    if(saveBtn) { saveBtn.disabled = true; var origText = saveBtn.textContent; saveBtn.textContent = 'Guardando...'; }
+
+                    fetch('/admin/usuarios/' + encodeURIComponent(uid), {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).then(function(res){
+                        return res.json().then(function(d){ return { ok: res.ok, status: res.status, body: d }; });
+                    }).then(function(r){
+                        if(r.ok && r.body && r.body.ok){
+                            // Update the corresponding row in the table (find by data-uid)
+                            try{
+                                var tableBody = document.querySelector('table tbody');
+                                var rows = tableBody ? tableBody.querySelectorAll('tr') : [];
+                                for(var i=0;i<rows.length;i++){
+                                    var tr = rows[i];
+                                    if(tr.getAttribute && tr.getAttribute('data-uid') === uid){
+                                        // update displayed cells
+                                        var nombreCell = tr.querySelector('td:first-child .text-sm');
+                                        var correoCell = tr.querySelector('td:nth-child(2) .text-sm');
+                                        var rolCell = tr.querySelector('td:nth-child(3) span');
+
+                                        var displayNombre = (payload.nombre || '') + (payload.apellido ? ' ' + payload.apellido : '');
+                                        if(nombreCell) nombreCell.textContent = displayNombre || '-';
+                                        if(correoCell) correoCell.textContent = payload.correo || '';
+                                        if(rolCell) rolCell.textContent = payload.rol || '';
+
+                                        // update data attributes used by filters
+                                        tr.setAttribute('data-nombre', displayNombre || (payload.correo||''));
+                                        tr.setAttribute('data-correo', payload.correo || '');
+                                        tr.setAttribute('data-rol', payload.rol || '');
+                                        // update assigned servicio attribute if provided
+                                        if(typeof payload.terapeuta_servicio !== 'undefined'){
+                                            tr.setAttribute('data-servicio', payload.terapeuta_servicio || '');
+                                        }
+                                        break;
+                                    }
+                                }
+                            }catch(e){ console.warn('Could not update row in DOM', e); }
+
+                            // close modal and show page alert
+                            closeEditModal();
+                            var alertModal = document.getElementById('pageAlertModal');
+                            var alertMsg = document.getElementById('pageAlertMessage');
+                            var alertTitle = document.getElementById('pageAlertTitle');
+                            if(alertMsg) alertMsg.textContent = 'Usuario actualizado.';
+                            if(alertTitle) alertTitle.textContent = 'Éxito';
+                            if(alertModal){ alertModal.classList.remove('hidden'); alertModal.classList.add('flex'); alertModal.setAttribute('aria-hidden','false'); }
+                            setTimeout(function(){ if(alertModal){ alertModal.classList.remove('flex'); alertModal.classList.add('hidden'); alertModal.setAttribute('aria-hidden','true'); } }, 2000);
+                        } else {
+                            var msg = (r.body && r.body.error) ? r.body.error : 'Error al actualizar usuario';
+                            if(alertEl){ alertEl.className=''; alertEl.classList.add('mb-4','p-3','rounded','bg-red-100','text-red-700'); alertEl.textContent = msg; alertEl.classList.remove('hidden'); }
+                        }
+                    }).catch(function(err){
+                        console.error('Update error', err);
+                        if(alertEl){ alertEl.className=''; alertEl.classList.add('mb-4','p-3','rounded','bg-red-100','text-red-700'); alertEl.textContent = 'Error de red al actualizar usuario'; alertEl.classList.remove('hidden'); }
+                    }).finally(function(){ if(saveBtn){ saveBtn.disabled = false; saveBtn.textContent = origText; } });
+                });
+            }
+        })();
+    </script>
+    <div id="deleteConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4">
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+                <h2 class="text-lg font-semibold">Confirmar eliminación</h2>
+                <button type="button" id="closeDeleteModalBtn" class="text-gray-600 hover:text-gray-800" aria-label="Cerrar modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-lg font-medium text-gray-700 mb-4">Estás por eliminar al usuario:</p>
+                <div class="mb-4 p-3 rounded bg-gray-50 border text-gray-800">
+                    <div id="deleteUserName" class="font-medium"></div>
+                    <div id="deleteUserEmail" class="text-sm text-gray-600"></div>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelDeleteBtn" class="px-4 py-2 rounded bg-white border text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    <button type="button" id="confirmDeleteBtn" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            // Current user uid from server-side template (try common keys uid and id)
+            // Assumption: template provides either `user.uid` or `user.id`. If neither is present this becomes empty string.
+            var currentUserUid = '{{user.uid}}' || '{{user.id}}' || '';
+
+            // On DOMContentLoaded, visually disable the delete button for the logged-in user so they can't delete themselves.
+            document.addEventListener('DOMContentLoaded', function(){
+                if(!currentUserUid) return;
+                var tableBody = document.querySelector('table tbody');
+                if(!tableBody) return;
+                var rows = tableBody.querySelectorAll('tr');
+                rows.forEach(function(tr){
+                    var uid = tr.getAttribute && tr.getAttribute('data-uid');
+                    if(uid && String(uid) === String(currentUserUid)){
+                        var delLink = tr.querySelector('.delete-user-btn');
+                        if(delLink){
+                            delLink.setAttribute('aria-disabled','true');
+                            delLink.removeAttribute('href');
+                            delLink.setAttribute('title','No puedes eliminar tu propio usuario');
+                            delLink.setAttribute('tabindex','-1');
+                            delLink.classList.add('pointer-events-none','opacity-50','cursor-not-allowed','text-gray-400');
+                        }
+                    }
+                });
+            });
+            var modal = document.getElementById('deleteConfirmModal');
+            var closeBtn = document.getElementById('closeDeleteModalBtn');
+            var cancelBtn = document.getElementById('cancelDeleteBtn');
+            var confirmBtn = document.getElementById('confirmDeleteBtn');
+            var nameEl = document.getElementById('deleteUserName');
+            var emailEl = document.getElementById('deleteUserEmail');
+
+            function openModalWithData(name, email){
+                if(!modal) return;
+                nameEl && (nameEl.textContent = name || '-');
+                emailEl && (emailEl.textContent = email || '');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.setAttribute('aria-hidden','false');
+                // focus confirm for keyboard users
+                setTimeout(function(){ confirmBtn && confirmBtn.focus(); }, 40);
+            }
+
+            function closeModal(){
+                if(!modal) return;
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden','true');
+                if (typeof pendingDeleteUid !== 'undefined') pendingDeleteUid = null;
+            }
+
+            // Delegate clicks from delete buttons. Prevent deleting the currently logged-in user.
+            function showDisabledDeleteAlert(){
+                var alertModal = document.getElementById('pageAlertModal');
+                var alertMsg = document.getElementById('pageAlertMessage');
+                var alertTitle = document.getElementById('pageAlertTitle');
+                if(alertMsg) alertMsg.textContent = 'No puedes eliminar el usuario con sesión iniciada.';
+                if(alertTitle) alertTitle.textContent = 'Atención';
+                if(alertModal){
+                    alertModal.classList.remove('hidden');
+                    alertModal.classList.add('flex');
+                    alertModal.setAttribute('aria-hidden','false');
+                    setTimeout(function(){ if(alertModal){ alertModal.classList.remove('flex'); alertModal.classList.add('hidden'); alertModal.setAttribute('aria-hidden','true'); } }, 2500);
+                }
+            }
+
+            document.addEventListener('click', function(e){
+                var btn = e.target.closest && e.target.closest('.delete-user-btn');
+                if(!btn) return;
+                e.preventDefault();
+
+                // If this button was disabled (aria-disabled) or targets current user, show alert and block
+                var btnDisabled = btn.getAttribute && btn.getAttribute('aria-disabled') === 'true';
+                var uid = btn.getAttribute && btn.getAttribute('data-uid');
+                if(btnDisabled || (uid && currentUserUid && String(uid) === String(currentUserUid))){
+                    showDisabledDeleteAlert();
+                    return;
+                }
+
+                var correo = btn.getAttribute('data-correo');
+                var nombre = btn.getAttribute('data-nombre');
+                var uidToDelete = uid || null;
+                openModalWithData(nombre, correo, uidToDelete);
+            });
+
+            if(closeBtn) closeBtn.addEventListener('click', closeModal);
+            if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            // Keep track of the uid to delete
+            var pendingDeleteUid = null;
+
+            function openModalWithData(name, email, uid){
+                if(!modal) return;
+                pendingDeleteUid = uid || null;
+                // show only the name (keep uid hidden)
+                nameEl && (nameEl.textContent = name || '-');
+                emailEl && (emailEl.textContent = email || '');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.setAttribute('aria-hidden','false');
+                // focus confirm for keyboard users
+                setTimeout(function(){ confirmBtn && confirmBtn.focus(); }, 40);
+            }
+
+            if(confirmBtn) confirmBtn.addEventListener('click', function(){
+                console.debug('confirmDelete clicked, pendingDeleteUid=', pendingDeleteUid);
+                if(!pendingDeleteUid){
+                    // design-only fallback: just close
+                    closeModal();
+                    return;
+                }
+
+                // Disable confirm and show loading
+                confirmBtn.disabled = true;
+                var originalText = confirmBtn.textContent;
+                confirmBtn.textContent = 'Eliminando...';
+
+                fetch('/admin/usuarios/' + encodeURIComponent(pendingDeleteUid), {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(function(res){
+                    return res.json().then(function(d){ return { ok: res.ok, status: res.status, body: d }; });
+                }).then(function(r){
+                    if(r.ok && r.body && r.body.ok){
+                        // Success: remove the row from the table and show page alert
+                        try{
+                            // find the corresponding row by data-uid attr
+                            var tableBody = document.querySelector('table tbody');
+                            var rows = tableBody ? tableBody.querySelectorAll('tr') : [];
+                            for(var i=0;i<rows.length;i++){
+                                var tr = rows[i];
+                                if(tr.getAttribute && tr.getAttribute('data-uid') === pendingDeleteUid){
+                                    tr.parentNode && tr.parentNode.removeChild(tr);
+                                    break;
+                                }
+                            }
+                        }catch(e){ console.warn('Could not remove row from DOM', e); }
+
+                        // close delete modal
+                        closeModal();
+
+                        // show success modal (pageAlertModal)
+                        var alertModal = document.getElementById('pageAlertModal');
+                        var alertMsg = document.getElementById('pageAlertMessage');
+                        var alertTitle = document.getElementById('pageAlertTitle');
+                        var closeAlertBtn = document.getElementById('closePageAlertBtn');
+                        if(alertMsg) alertMsg.textContent = 'Usuario eliminado con éxito.';
+                        if(alertTitle) alertTitle.textContent = 'Éxito';
+                        if(alertModal){
+                            alertModal.classList.remove('hidden');
+                            alertModal.classList.add('flex');
+                            alertModal.setAttribute('aria-hidden','false');
+                        }
+
+                        // auto-close after 5s
+                        var autoCloseTimer = setTimeout(function(){
+                            if(alertModal){ alertModal.classList.remove('flex'); alertModal.classList.add('hidden'); alertModal.setAttribute('aria-hidden','true'); }
+                            //Refrescar la página para actualizar la lista de usuarios
+                            window.location.reload();
+                        }, 5000);
+
+                        // allow manual close and clear timer
+                        if(closeAlertBtn){
+                            closeAlertBtn.onclick = function(){
+                                if(autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
+                                if(alertModal){ alertModal.classList.remove('flex'); alertModal.classList.add('hidden'); alertModal.setAttribute('aria-hidden','true'); }
+                                window.location.reload();
+                            };
+                        }
+
+                        // re-enable confirm button state
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = originalText;
+                    } else {
+                        // show inline error in modal
+                        var msg = (r.body && r.body.error) ? r.body.error : 'Error al eliminar usuario';
+                        nameEl && (nameEl.textContent = 'Error: ' + msg);
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = originalText;
+                    }
+                }).catch(function(err){
+                    console.error('Delete error', err);
+                    nameEl && (nameEl.textContent = 'Error de red al eliminar usuario');
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = originalText;
+                }).finally(function(){
+                    // clear pending uid if still set
+                    pendingDeleteUid = null;
+                });
+            });
+
+            // close on ESC
+            document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape'){ if(modal && !modal.classList.contains('hidden')) closeModal(); }});
+        })();
+    </script>

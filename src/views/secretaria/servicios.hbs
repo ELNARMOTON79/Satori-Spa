@@ -1,0 +1,133 @@
+<div class="bg-gradient-to-b from-[#FFFDF9] to-[#FDFBF7] min-h-screen dashboard-text-brown">
+    <style>
+        .dashboard-text-brown, .dashboard-text-brown * { color: #5A3E2A !important; }
+        /* Excepción: mantener el texto del botón PDF en blanco */
+        .dashboard-text-brown a.pdf-btn, .dashboard-text-brown a.pdf-btn * { color: #ffffff !important; }
+        /* Excepción adicional: respetar elementos que usan la utilidad "text-white" (sidebar activo, botones, etc.) */
+        .dashboard-text-brown .text-white, .dashboard-text-brown .text-white * { color: #ffffff !important; }
+    </style>
+    <div class="flex h-screen">
+    {{> secretaria_sidebar sections=sections active=active user=user}}
+    <main class="flex-1 p-6 flex flex-col min-h-0 overflow-hidden">
+
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-0">
+                    <i class="fa-solid fa-concierge-bell mr-2" aria-hidden="true"></i>
+                    <h1 class="text-2xl font-bold">Servicios</h1>
+                </div>
+                
+            </div>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 w-full md:w-1/2">
+                    <label for="serviceSearch" class="sr-only">Buscar servicios</label>
+                    <i class="fa-solid fa-magnifying-glass text-gray-500 pl-2" aria-hidden="true"></i>
+                    <input id="serviceSearch" type="search" placeholder="Buscar por nombre o descripción" class="block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Buscar servicios" />
+                </div>
+
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label for="serviceCategory" class="text-sm font-medium text-gray-700 inline-flex items-center">
+                        <i class="fa-solid fa-filter mr-2 text-gray-600" aria-hidden="true"></i>
+                        Filtrar por categoría:
+                    </label>
+                    <select id="serviceCategory" class="appearance-none rounded-md border-gray-300 bg-white pl-3 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6B4F2B] focus:border-[#6B4F2B]" aria-label="Filtrar por categoría">
+                        <option value="all">Todos</option>
+                        <option value="masaje">Masajes</option>
+                        <option value="faciales">Faciales</option>
+                    </select>
+                </div>
+            </div>
+
+            <section aria-labelledby="servicesHeading" class="mb-8 overflow-auto flex-1">
+                <h2 id="servicesHeading" class="sr-only">Listado de servicios</h2>
+
+                {{#if servicios}}
+                    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {{#each servicios}}
+                            <article class="bg-white rounded-2xl shadow p-4 flex flex-col overflow-hidden" data-id="{{id}}" data-servicio="{{servicio}}" data-categoria="{{categoria}}" data-descripcion="{{descripcion}}" data-precio="{{precio}}" data-imagen="{{imagen}}" data-estado="{{estado}}">
+                                <div class="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+                                    {{#if imagen}}
+                                        <img src="{{imagen}}" alt="{{servicio}}" class="object-cover w-full h-full" />
+                                    {{else}}
+                                        <div class="text-gray-400 text-sm">Imagen</div>
+                                    {{/if}}
+                                </div>
+
+                                <div class="flex-1">
+                                    <h3 class="text-base font-semibold text-gray-900 mb-2">{{servicio}}</h3>
+                                    <p class="text-sm text-gray-600 mb-4">{{descripcion}}</p>
+                                    {{#if therapist}}
+                                        <div class="text-sm text-gray-700 mb-2">Terapeuta: {{therapist}}</div>
+                                    {{/if}}
+                                </div>
+
+                                <div class="mt-2 flex items-center justify-between">
+                                    <div class="text-sm text-gray-700 font-medium">{{#if categoria}}{{categoria}}{{else}}Servicio{{/if}}</div>
+                                    <div class="text-lg font-semibold text-[#6B4F2B]">{{#if precio}}${{precio}}{{else}}--{{/if}}</div>
+                                    <div class="text-sm text-gray-500">{{#if duracion}}{{duracion}} min{{else}}--{{/if}}</div>
+                               
+                            </article>
+                        {{/each}}
+                    </div>
+                {{else}}
+                    <p class="text-gray-500">No hay servicios disponibles.</p>
+                {{/if}}
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var searchInput = document.getElementById('serviceSearch');
+        var categorySelect = document.getElementById('serviceCategory');
+        var stateSelect = document.getElementById('serviceState');
+        var container = document.querySelector('section[aria-labelledby="servicesHeading"]');
+        var cards = container ? Array.prototype.slice.call(container.querySelectorAll('article[data-servicio]')) : [];
+
+        function normalize(s){ return (s||'').toString().toLowerCase().trim(); }
+
+        function applyFilter(){
+            var q = normalize(searchInput && searchInput.value);
+            var cat = categorySelect ? categorySelect.value : 'all';
+            var anyVisible = false;
+
+            cards.forEach(function(card){
+                var nombre = normalize(card.getAttribute('data-servicio'));
+                var desc = normalize(card.getAttribute('data-descripcion'));
+                var categoria = (card.getAttribute('data-categoria') || '').toString().toLowerCase();
+                var estado = (card.getAttribute('data-estado') || '').toString().toLowerCase();
+
+                var matchesQuery = !q || nombre.indexOf(q) !== -1 || desc.indexOf(q) !== -1;
+                var matchesCategory = (cat === 'all') || (categoria === cat) || (categoria.indexOf(cat) !== -1);
+                var st = stateSelect ? stateSelect.value : 'all';
+                var matchesState = (st === 'all') || (estado === st) || (estado.indexOf(st) !== -1);
+
+                if(matchesQuery && matchesCategory && matchesState){
+                    card.style.display = '';
+                    anyVisible = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            var noEl = document.getElementById('noServicesMessage');
+            if(noEl){ if(!anyVisible) noEl.classList.remove('hidden'); else noEl.classList.add('hidden'); }
+        }
+
+        function debounce(fn, wait){ var t; return function(){ var args = arguments; clearTimeout(t); t = setTimeout(function(){ fn.apply(null, args); }, wait); }; }
+
+        function sanitizeSearchValue(v){ if(!v) return ''; return v.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'\-]/g, ''); }
+
+        function onSearchInput(){ if(!searchInput) return; var old = searchInput.value; var cleaned = sanitizeSearchValue(old); if(old !== cleaned) { var pos = searchInput.selectionStart || 0; searchInput.value = cleaned; try{ searchInput.setSelectionRange(pos-1 < 0 ? 0 : pos-1, pos-1 < 0 ? 0 : pos-1); }catch(e){} } applyFilter(); }
+
+        function onlyLettersSearchKeydown(e){ if(e.keyCode === 8 || e.keyCode === 46 || (e.keyCode >= 37 && e.keyCode <= 40) || e.keyCode === 9) return; var k = e.key; if(!k) return; var allowedRe = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'\-]$/; if(!allowedRe.test(k)){ e.preventDefault(); } }
+
+        if(searchInput) { searchInput.addEventListener('keydown', onlyLettersSearchKeydown); searchInput.addEventListener('input', debounce(onSearchInput, 180)); searchInput.value = sanitizeSearchValue(searchInput.value || ''); }
+        if(categorySelect) categorySelect.addEventListener('change', applyFilter);
+        if(stateSelect) stateSelect.addEventListener('change', applyFilter);
+
+        applyFilter();
+    })();
+</script>

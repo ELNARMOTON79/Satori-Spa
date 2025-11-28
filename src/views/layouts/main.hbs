@@ -5,11 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SATORI SPA</title>
     <!--Script tailwind-->
+    <!-- Font Awesome for sidebar icons (CDN link without SRI for local/dev use) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     
     {{{body}}}
+
+        <script>
+            
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
+            });
+            window.addEventListener('popstate', function () {
+                setTimeout(function () { window.location.reload(); }, 10);
+            });
+        </script>
 
 </body>
 </html>
